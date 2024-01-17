@@ -25,6 +25,12 @@ public class BusinessException extends RuntimeException {
         this.code = errorCode.getCode();
     }
 
+    public BusinessException(String message) {
+        super(message);
+        // -9999 自定义异常
+        this.code = -9999;
+    }
+
     public BusinessException(ResultCode errorCode, String message) {
         super(message);
         this.code = errorCode.getCode();

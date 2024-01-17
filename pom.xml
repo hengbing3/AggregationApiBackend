@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.christer</groupId>
-    <artifactId>springboot-template</artifactId>
+    <artifactId>AggregationApiBackend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>springboot-template</name>
-    <description>springboot-template</description>
+    <name>AggregationApiBackend</name>
+    <description>AggregationApiBackend</description>
     <properties>
         <java.version>1.8</java.version>
     </properties>

@@ -30,6 +30,10 @@ public class SessionServiceConfig {
         return userInfo;
     }
 
+    public Long getCurrentUserId() {
+        return getCurrentUserInfo().getId();
+    }
+
     public void logout() {
         log.info("用户登出:{}", StpUtil.getTokenValue());
         StpUtil.logout();

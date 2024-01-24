@@ -13,7 +13,7 @@ public final class WebURLConstant {
     }
 
     private static final String URI_USER = "/user";
-    private static final String URI_PAGE = "/page";
+    public static final String URI_PAGE = "/page";
 
     public static final String URI_USER_REGISTER = URI_USER +  "/register";
 
@@ -27,4 +27,8 @@ public final class WebURLConstant {
     public static final String URI_POST = "/post";
 
     public static final String URI_POST_PAGE = URI_POST + URI_PAGE;
+
+    public static final String URI_INTERFACE_INFO = "/interfaceInfo";
+
+
 }

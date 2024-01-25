@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.christer.project.model.vo.UserInfoVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Christer
@@ -30,13 +31,12 @@ public class SessionServiceConfig {
         return userInfo;
     }
 
-    public Long getCurrentUserId() {
-        return getCurrentUserInfo().getId();
-    }
 
-    public void logout() {
-        log.info("用户登出:{}", StpUtil.getTokenValue());
+    public boolean logout() {
+        final String tokenValue = StpUtil.getTokenValue();
+        log.info("用户登出:{}", tokenValue);
         StpUtil.logout();
+        return StringUtils.hasText(tokenValue);
     }
 
 

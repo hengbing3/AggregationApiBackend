@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.christer.project.model.dto.user.UserLoginParam;
 import com.christer.project.model.dto.user.UserQueryParam;
 import com.christer.project.model.dto.user.UserRegisterParam;
+import com.christer.project.model.dto.user.UserUpdateParam;
 import com.christer.project.model.vo.UserInfoVO;
 
 /**
@@ -33,4 +34,18 @@ public interface UserService {
      * @return
      */
     Page<UserInfoVO> queryUserByCondition(UserQueryParam userParam);
+
+    /**
+     * 查看详情
+     * @param id 用户id
+     * @return obj
+     */
+    UserInfoVO selectById(Long id);
+
+    /**
+     * 用户信息更新
+     * @param userUpdateParam
+     * @return
+     */
+    boolean updateUserInfo(UserUpdateParam userUpdateParam);
 }

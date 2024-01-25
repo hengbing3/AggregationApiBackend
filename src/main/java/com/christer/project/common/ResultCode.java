@@ -10,7 +10,7 @@ public enum ResultCode {
     /**
      * api状态码
      */
-    SUCCESS(200, "请求成功"),
+    SUCCESS(200, "ok"),
     FAILED(9999, "操作失败"),
     TOKEN_FAILED(10002, "token失效"),
     FILE_UPLOAD_ERROR(40001,"文件上传失败！"),
@@ -18,6 +18,7 @@ public enum ResultCode {
     NONE(99999, "无"),
     INTERFACE_ADD_ERROR(1000, "接口信息新增失败！"),
     INTERFACE_EDIT_ERROR(1001, "接口信息编辑失败！"),
+    PARAMS_VALIDATE_ERROR(40001, "参数校验失败！"),
     PARAMS_ERROR(40000, "请求参数错误！");
 
     private final int code;

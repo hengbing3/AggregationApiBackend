@@ -10,6 +10,7 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * @author Christer
@@ -20,7 +21,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 @Getter
 @ToString
-public class InterfaceInfoParam {
+public class InterfaceInfoParam implements Serializable {
 
 
     @TableField(exist = false)

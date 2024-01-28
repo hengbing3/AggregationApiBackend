@@ -19,12 +19,12 @@ public class PageCondition {
      * 当前页数
      */
     @NotNull(message = "当前页数不能为空！")
-    private Integer currentPage;
+    private Integer currentPage = 1;
     /**
      * 页面大小
      */
     @NotNull(message = "页数大小不能为空！")
-    private Integer pageSize;
+    private Integer pageSize = 20;
     /**
      * 当前查询开始记录
      */

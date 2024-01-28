@@ -11,6 +11,7 @@ import com.christer.project.model.dto.interfaceinfo.QueryInterfaceInfoParam;
 import com.christer.project.model.entity.InterfaceInfo;
 import com.christer.project.service.InterfaceInfoService;
 import com.christer.project.util.ValidateGroup;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,7 @@ public class InterfaceInfoController extends AbstractSessionController {
      * @return 查询结果
      */
     @PostMapping(WebURLConstant.URI_PAGE)
+    @ApiOperation("接口信息-分页查询")
     public CommonResult<Page<InterfaceInfo>> queryByPage(@RequestBody QueryInterfaceInfoParam interfaceInfoParam) {
         log.info("接口信息，分页查询条件:{}", interfaceInfoParam);
         final Page<InterfaceInfo> interfaceInfos = interfaceInfoService.queryByPage(interfaceInfoParam);
@@ -58,6 +60,7 @@ public class InterfaceInfoController extends AbstractSessionController {
      * @return 单条数据
      */
     @GetMapping
+    @ApiOperation("根据id查看接口详情")
     public CommonResult<InterfaceInfo> queryById(@RequestParam("id") Long id) {
         log.info("查看接口详情，id:{}", id);
         final InterfaceInfo interfaceInfo = interfaceInfoService.queryById(id);
@@ -71,6 +74,7 @@ public class InterfaceInfoController extends AbstractSessionController {
      * @return 新增结果
      */
     @PostMapping
+    @ApiOperation("新增接口数据")
     public CommonResult<Void> addInterFaceInfo(@RequestBody @Validated(ValidateGroup.Save.class) InterfaceInfoParam interfaceInfo) {
         log.info("新增接口数据:{}", interfaceInfo);
         interfaceInfo.setCreateUserId(getCurrentUserId());
@@ -86,6 +90,7 @@ public class InterfaceInfoController extends AbstractSessionController {
      * @return 编辑结果
      */
     @PutMapping
+    @ApiOperation("编辑接口数据")
     public CommonResult<Void> editInterFaceInfo(@RequestBody @Validated(ValidateGroup.Update.class) InterfaceInfoParam interfaceInfo) {
         log.info("编辑接口数据:{}", interfaceInfo);
         interfaceInfo.setUpdateUserId(getCurrentUserId());
@@ -101,6 +106,7 @@ public class InterfaceInfoController extends AbstractSessionController {
      * @return 删除是否成功
      */
     @DeleteMapping
+    @ApiOperation("删除接口数据")
     public CommonResult<Void> deleteById(@RequestParam("id") Long id) {
         log.info("删除接口数据:{}", id);
         final Long currentUserId = getCurrentUserId();

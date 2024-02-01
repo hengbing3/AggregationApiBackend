@@ -7,6 +7,7 @@ import com.christer.project.util.ValidateGroup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -38,6 +39,7 @@ public class InterfaceInfoParam implements Serializable {
      * 名称
      */
     @NotBlank(groups = {ValidateGroup.Save.class,ValidateGroup.Update.class})
+    @Length(max = 20, message = "接口名称过长！",groups = {ValidateGroup.Save.class,ValidateGroup.Update.class})
     private String name;
 
     /**

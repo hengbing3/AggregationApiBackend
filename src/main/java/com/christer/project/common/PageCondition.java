@@ -1,5 +1,6 @@
 package com.christer.project.common;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,11 +20,13 @@ public class PageCondition {
      * 当前页数
      */
     @NotNull(message = "当前页数不能为空！")
+    @JsonProperty("current")
     private Integer currentPage = 1;
     /**
      * 页面大小
      */
     @NotNull(message = "页数大小不能为空！")
+    @JsonProperty("pageSize")
     private Integer pageSize = 20;
     /**
      * 当前查询开始记录

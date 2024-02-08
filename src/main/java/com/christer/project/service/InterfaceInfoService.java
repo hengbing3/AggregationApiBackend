@@ -1,6 +1,7 @@
 package com.christer.project.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.christer.project.model.dto.interfaceinfo.InterfaceInfoInvokeParam;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoParam;
 import com.christer.project.model.dto.interfaceinfo.QueryInterfaceInfoParam;
 import com.christer.project.model.entity.InterfaceInfo;
@@ -39,4 +40,11 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
      * @return
      */
     boolean outlineInterfaceInfo(Long id, Long currentUserId);
+
+    /**
+     * 接口调试
+     * @param param
+     * @return
+     */
+    Object invokeInterfaceInfo(InterfaceInfoInvokeParam param, Long currentUserId);
 }

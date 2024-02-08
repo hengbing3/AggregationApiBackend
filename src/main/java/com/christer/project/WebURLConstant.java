@@ -32,6 +32,7 @@ public final class WebURLConstant {
 
     public static final String URI_ONLINE = "/online";
     public static final String URI_OUTLINE = "/outline";
+    public static final String URI_INVOKE = "/invoke";
 
 
 }

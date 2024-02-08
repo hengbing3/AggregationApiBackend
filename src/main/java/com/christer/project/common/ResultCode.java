@@ -12,7 +12,7 @@ public enum ResultCode {
      */
     SUCCESS(200, "ok"),
     FAILED(9999, "操作失败"),
-    TOKEN_FAILED(10002, "token失效"),
+    TOKEN_FAILED(401, "token失效"),
     FILE_UPLOAD_ERROR(40001,"文件上传失败！"),
     SYSTEM_ERROR(50000, "系统内部异常"),
     NONE(99999, "无"),

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.christer.project.WebURLConstant;
 import com.christer.project.common.CommonResult;
 import com.christer.project.common.ResultBody;
+import com.christer.project.model.dto.interfaceinfo.InterfaceInfoInvokeParam;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoParam;
 import com.christer.project.model.dto.interfaceinfo.QueryInterfaceInfoParam;
 import com.christer.project.model.entity.InterfaceInfo;
@@ -143,6 +144,16 @@ public class InterfaceInfoController extends AbstractSessionController {
                 ResultBody.success() :
                 ResultBody.failed(FAILED.getCode(), FAILED.getMessage());
     }
-
+    /**
+     * 接口调试
+     */
+    @PostMapping(WebURLConstant.URI_INVOKE)
+    @ApiOperation("接口调试")
+    public CommonResult<Object> invokeInterfaceInfo(@RequestBody @Validated InterfaceInfoInvokeParam param) {
+        log.info("接口调试，请求参数:{}", param);
+        Long currentUserId = getCurrentUserId();
+        final Object invokeResult = interfaceInfoService.invokeInterfaceInfo(param, currentUserId);
+        return ResultBody.success(invokeResult);
+    }
 }
 

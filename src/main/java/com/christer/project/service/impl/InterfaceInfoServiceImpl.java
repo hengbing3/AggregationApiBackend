@@ -11,11 +11,17 @@ import com.christer.project.common.ResultCode;
 import com.christer.project.exception.BusinessException;
 import com.christer.project.exception.ThrowUtils;
 import com.christer.project.mapper.InterfaceInfoMapper;
+import com.christer.project.mapper.UserMapper;
+import com.christer.project.model.dto.interfaceinfo.InterfaceInfoInvokeParam;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoParam;
 import com.christer.project.model.dto.interfaceinfo.QueryInterfaceInfoParam;
 import com.christer.project.model.entity.InterfaceInfo;
+import com.christer.project.model.entity.UserEntity;
 import com.christer.project.model.enums.InterfaceInfoStatusEnum;
 import com.christer.project.service.InterfaceInfoService;
+import com.christer.project.util.ValidateUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -32,9 +38,11 @@ import java.util.Objects;
  */
 @Service
 @RequiredArgsConstructor
-public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, InterfaceInfo> implements InterfaceInfoService{
+public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, InterfaceInfo> implements InterfaceInfoService {
 
     private final InterfaceInfoMapper interfaceInfoMapper;
+
+    private final UserMapper userMapper;
 
     private final MyApiClient myApiClient;
 
@@ -116,5 +124,32 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         updateInterfaceInfo.setUpdateTime(new Date());
         updateInterfaceInfo.setStatus(InterfaceInfoStatusEnum.OFFLINE.getCode());
         return interfaceInfoMapper.updateById(updateInterfaceInfo) > 0;
+    }
+
+    @Override
+    public Object invokeInterfaceInfo(InterfaceInfoInvokeParam param, Long currentUserId) {
+        // 业务层校验
+        ValidateUtil.validateBean(param);
+        Objects.requireNonNull(currentUserId, "当前用户信息不存在！");
+        // 根据接口id获取接口信息
+        final InterfaceInfo interfaceInfo = interfaceInfoMapper.selectById(param.getId());
+        ThrowUtils.throwIf(null == interfaceInfo, "接口信息不存在！");
+        // 判断接口是否已经下线
+        ThrowUtils.throwIf(InterfaceInfoStatusEnum.OFFLINE.getCode().equals(interfaceInfo.getStatus()), "该接口已下线，无法调用！");
+        // 获取当前登录用户的密钥
+        final UserEntity userEntity = userMapper.selectById(currentUserId);
+        final String accessKey = userEntity.getAccessKey();
+        final String secretKey = userEntity.getSecretKey();
+        final MyApiClient myClient = new MyApiClient(accessKey, secretKey);
+        // 调用接口
+        // TODO 调用接口的逻辑必须修改
+        final Gson gson = new Gson();
+        User user = null;
+        try {
+            user = gson.fromJson(param.getUserRequestParams(), User.class);
+        } catch (JsonSyntaxException e) {
+            throw new BusinessException(ResultCode.PARAMS_ERROR, "请按照规范填写请求参数！");
+        }
+        return myClient.getUsernameByPost(user);
     }
 }

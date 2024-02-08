@@ -23,4 +23,20 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
     boolean editInterfaceInto(InterfaceInfoParam interfaceInfo);
 
     boolean deleteById(Long id, Long currentUserId);
+
+    /**
+     * 上线接口
+     * @param id
+     * @param currentUserId
+     * @return
+     */
+    boolean onlineInterfaceInfo(Long id, Long currentUserId);
+
+    /**
+     * 接口下线
+     * @param id
+     * @param currentUserId
+     * @return
+     */
+    boolean outlineInterfaceInfo(Long id, Long currentUserId);
 }

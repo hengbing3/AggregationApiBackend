@@ -30,5 +30,8 @@ public final class WebURLConstant {
 
     public static final String URI_INTERFACE_INFO = "/interfaceInfo";
 
+    public static final String URI_ONLINE = "/online";
+    public static final String URI_OUTLINE = "/outline";
+
 
 }

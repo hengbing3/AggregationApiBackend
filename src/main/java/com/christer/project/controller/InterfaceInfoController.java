@@ -2,6 +2,7 @@ package com.christer.project.controller;
 
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.christer.project.WebURLConstant;
 import com.christer.project.common.CommonResult;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import static com.christer.project.common.ResultCode.*;
 
 /**
- * 接口信息(InterfaceInfo)表控制层
+ * 接口信息管理
  *
  * @author Christer
  * @since 2024-01-21 22:39:03
@@ -111,6 +112,34 @@ public class InterfaceInfoController extends AbstractSessionController {
         log.info("删除接口数据:{}", id);
         final Long currentUserId = getCurrentUserId();
         return interfaceInfoService.deleteById(id, currentUserId) ?
+                ResultBody.success() :
+                ResultBody.failed(FAILED.getCode(), FAILED.getMessage());
+    }
+
+    /**
+     * 接口发布
+     */
+    @PutMapping(WebURLConstant.URI_ONLINE)
+    @ApiOperation("接口发布（上线）")
+    @SaCheckRole("admin")
+    public CommonResult<Void> onlineInterfaceInfo(@RequestParam Long id) {
+        log.info("发布接口信息，接口id:{}", id);
+        final Long currentUserId = getCurrentUserId();
+        return interfaceInfoService.onlineInterfaceInfo(id, currentUserId) ?
+                ResultBody.success() :
+                ResultBody.failed(FAILED.getCode(), FAILED.getMessage());
+    }
+    /**
+     * 接口下线
+     *
+     */
+    @PutMapping(WebURLConstant.URI_OUTLINE)
+    @ApiOperation("接口下线")
+    @SaCheckRole("admin")
+    public CommonResult<Void> outlineInterfaceInfo(@RequestParam Long id) {
+        log.info("接口下线，接口id:{}", id);
+        final Long currentUserId = getCurrentUserId();
+        return interfaceInfoService.outlineInterfaceInfo(id, currentUserId) ?
                 ResultBody.success() :
                 ResultBody.failed(FAILED.getCode(), FAILED.getMessage());
     }

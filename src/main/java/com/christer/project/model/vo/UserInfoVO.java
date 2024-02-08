@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author Christer
@@ -43,6 +44,10 @@ public class UserInfoVO implements Serializable {
      * 用户角色：user/admin/ban
      */
     private String userRole;
+    /**
+     * 用户权限编码集合，用于后期对权限精确到 按钮控制
+     */
+    private List<String> userPermissionList;
 
     private String token;
 }

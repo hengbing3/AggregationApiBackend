@@ -73,3 +73,8 @@ cos:
   imagePrefix: /image
   videoPrefix: /video
   filePrefix: /file
+
+myapi:
+  client:
+    access-key: abin
+    secret-key: abcdefg

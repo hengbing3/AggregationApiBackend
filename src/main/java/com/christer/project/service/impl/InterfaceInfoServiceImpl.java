@@ -1,16 +1,28 @@
 package com.christer.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.christer.myapiclientsdk.client.MyApiClient;
+import com.christer.myapiclientsdk.model.User;
+import com.christer.project.common.ResultCode;
+import com.christer.project.exception.BusinessException;
+import com.christer.project.exception.ThrowUtils;
 import com.christer.project.mapper.InterfaceInfoMapper;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoParam;
 import com.christer.project.model.dto.interfaceinfo.QueryInterfaceInfoParam;
 import com.christer.project.model.entity.InterfaceInfo;
+import com.christer.project.model.enums.InterfaceInfoStatusEnum;
 import com.christer.project.service.InterfaceInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author Christer
@@ -23,6 +35,8 @@ import org.springframework.stereotype.Service;
 public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, InterfaceInfo> implements InterfaceInfoService{
 
     private final InterfaceInfoMapper interfaceInfoMapper;
+
+    private final MyApiClient myApiClient;
 
     @Override
     public boolean addInterFaceInfo(InterfaceInfoParam interfaceInfo) {
@@ -54,5 +68,53 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
     @Override
     public boolean deleteById(Long id, Long currentUserId) {
         return interfaceInfoMapper.deleteById(id) > 0;
+    }
+
+    @Override
+    public boolean onlineInterfaceInfo(Long id, Long currentUserId) {
+        Objects.requireNonNull(id, "接口id不存在！");
+        Objects.requireNonNull(currentUserId, "当前用户id不存在！");
+        // 获取接口信息
+        InterfaceInfo interfaceInfo = interfaceInfoMapper.selectById(id);
+        ThrowUtils.throwIf(null == interfaceInfo, "接口信息不存在！");
+        // 判断接口是否能够调用
+        // TODO 目前模拟的接口sdk里的代码写死了，我们后续再优化
+        User user = new User();
+        user.setUsername("加油上线！！！");
+        String result = myApiClient.getUsernameByPost(user);
+        if (!StringUtils.hasText(result)) {
+            throw new BusinessException(ResultCode.FAILED, "接口调用失败！");
+        }
+        // 修改接口状态
+        InterfaceInfo updateInterfaceInfo = new InterfaceInfo();
+        updateInterfaceInfo.setId(id);
+        updateInterfaceInfo.setUpdateUserId(currentUserId);
+        updateInterfaceInfo.setUpdateTime(new Date());
+        updateInterfaceInfo.setStatus(InterfaceInfoStatusEnum.ONLINE.getCode());
+        return interfaceInfoMapper.updateById(updateInterfaceInfo) > 0;
+    }
+
+    @Override
+    public boolean outlineInterfaceInfo(Long id, Long currentUserId) {
+        Objects.requireNonNull(id, "接口id不存在！");
+        Objects.requireNonNull(currentUserId, "当前用户id不存在！");
+        // 获取接口信息
+        InterfaceInfo interfaceInfo = interfaceInfoMapper.selectById(id);
+        ThrowUtils.throwIf(null == interfaceInfo, "接口信息不存在！");
+        // 判断接口是否能够调用
+        // TODO 目前模拟的接口sdk里的代码写死了，我们后续再优化
+        User user = new User();
+        user.setUsername("加油下线！！！");
+        String result = myApiClient.getUsernameByPost(user);
+        if (!StringUtils.hasText(result)) {
+            throw new BusinessException(ResultCode.FAILED, "接口调用失败！");
+        }
+        // 修改接口状态
+        InterfaceInfo updateInterfaceInfo = new InterfaceInfo();
+        updateInterfaceInfo.setId(id);
+        updateInterfaceInfo.setUpdateUserId(currentUserId);
+        updateInterfaceInfo.setUpdateTime(new Date());
+        updateInterfaceInfo.setStatus(InterfaceInfoStatusEnum.OFFLINE.getCode());
+        return interfaceInfoMapper.updateById(updateInterfaceInfo) > 0;
     }
 }

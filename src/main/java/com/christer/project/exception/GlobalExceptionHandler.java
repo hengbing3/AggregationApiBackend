@@ -1,5 +1,6 @@
 package com.christer.project.exception;
 
+import cn.dev33.satoken.exception.NotLoginException;
 import com.christer.project.common.CommonResult;
 import com.christer.project.common.ResultBody;
 import com.christer.project.common.ResultCode;
@@ -42,5 +43,17 @@ public class GlobalExceptionHandler {
             errBuilder.append(" ").append(fieldError.getDefaultMessage());
         }
         return ResultBody.failed(ResultCode.PARAMS_ERROR, errBuilder.toString());
+    }
+
+    /**
+     * 未登录异常
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(NotLoginException.class)
+    public CommonResult<String> notLoginException(NotLoginException e) {
+        // 打印堆栈信息
+        log.error("未登录错误:", e);
+        return ResultBody.failed(ResultCode.TOKEN_FAILED, "请进行登录操作");
     }
 }

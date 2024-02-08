@@ -70,6 +70,14 @@ public class UserEntity implements Serializable {
      * 用户角色：user/admin/ban
      */
     private String userRole;
+    /**
+     * 访问密钥
+     */
+    private String accessKey;
+    /**
+     * 加密密钥
+     */
+    private String secretKey;
 
     /**
      * 创建时间

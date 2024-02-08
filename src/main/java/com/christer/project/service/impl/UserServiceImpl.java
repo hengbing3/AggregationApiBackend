@@ -1,6 +1,8 @@
 package com.christer.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -57,6 +59,9 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = BeanUtil.copyProperties(userParam, UserEntity.class);
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userEntity.getUserPassword()).getBytes());
         userEntity.setUserPassword(encryptPassword);
+        // 注册时，分配密钥
+        userEntity.setAccessKey(DigestUtil.md5Hex(SALT + userParam.getUserAccount() + RandomUtil.randomNumbers(5)));
+        userEntity.setSecretKey(DigestUtil.md5Hex(SALT + userParam.getUserAccount() + RandomUtil.randomNumbers(8)));
         userMapper.insert(userEntity);
         return userEntity.getId();
     }

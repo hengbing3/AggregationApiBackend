@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 
 /**
-* @author DEKU
+* @author Christer
 * @description 针对表【interface_info(接口信息)】的数据库操作Service
 * @createDate 2024-01-21 22:28:55
 */

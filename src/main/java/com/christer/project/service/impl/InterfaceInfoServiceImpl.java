@@ -1,7 +1,6 @@
 package com.christer.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -23,10 +22,10 @@ import com.christer.project.util.ValidateUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
 
@@ -38,6 +37,7 @@ import java.util.Objects;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, InterfaceInfo> implements InterfaceInfoService {
 
     private final InterfaceInfoMapper interfaceInfoMapper;
@@ -150,6 +150,8 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         } catch (JsonSyntaxException e) {
             throw new BusinessException(ResultCode.PARAMS_ERROR, "请按照规范填写请求参数！");
         }
-        return myClient.getUsernameByPost(user);
+        final String usernameByPost = myClient.getUsernameByPost(user);
+        log.info("调用结果：{}", usernameByPost);
+        return usernameByPost;
     }
 }

@@ -17,6 +17,10 @@ public final class CommonConstant {
      * 盐值，混淆密码
      */
     public static final String SALT = "My*Christer";
+    /**
+     * 角色常量：admin
+     */
+    public static final String ADMIN_ROLE = "admin";
 
 
     public static final String SORT_ORDER_ASC = "asc";

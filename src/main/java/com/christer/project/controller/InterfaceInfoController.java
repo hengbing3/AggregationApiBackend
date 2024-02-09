@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.christer.project.WebURLConstant;
 import com.christer.project.common.CommonResult;
 import com.christer.project.common.ResultBody;
+import com.christer.project.constant.CommonConstant;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoInvokeParam;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoParam;
 import com.christer.project.model.dto.interfaceinfo.QueryInterfaceInfoParam;
@@ -122,7 +123,7 @@ public class InterfaceInfoController extends AbstractSessionController {
      */
     @PutMapping(WebURLConstant.URI_ONLINE)
     @ApiOperation("接口发布（上线）")
-    @SaCheckRole("admin")
+    @SaCheckRole(CommonConstant.ADMIN_ROLE)
     public CommonResult<Void> onlineInterfaceInfo(@RequestParam Long id) {
         log.info("发布接口信息，接口id:{}", id);
         final Long currentUserId = getCurrentUserId();
@@ -136,7 +137,7 @@ public class InterfaceInfoController extends AbstractSessionController {
      */
     @PutMapping(WebURLConstant.URI_OUTLINE)
     @ApiOperation("接口下线")
-    @SaCheckRole("admin")
+    @SaCheckRole(CommonConstant.ADMIN_ROLE)
     public CommonResult<Void> outlineInterfaceInfo(@RequestParam Long id) {
         log.info("接口下线，接口id:{}", id);
         final Long currentUserId = getCurrentUserId();

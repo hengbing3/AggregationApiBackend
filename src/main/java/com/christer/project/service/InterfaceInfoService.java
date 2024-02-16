@@ -1,10 +1,11 @@
 package com.christer.project.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.christer.myapicommon.model.entity.InterfaceInfo;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoInvokeParam;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoParam;
 import com.christer.project.model.dto.interfaceinfo.QueryInterfaceInfoParam;
-import com.christer.project.model.entity.InterfaceInfo;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 

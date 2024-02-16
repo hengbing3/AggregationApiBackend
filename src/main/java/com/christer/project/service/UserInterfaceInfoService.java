@@ -7,7 +7,7 @@ import com.christer.project.model.dto.userinterfaceinfo.QueryUserInterfaceInfoLi
 import com.christer.project.model.dto.userinterfaceinfo.QueryUserInterfaceInfoParam;
 import com.christer.project.model.dto.userinterfaceinfo.UserInterfaceInfoAddParam;
 import com.christer.project.model.dto.userinterfaceinfo.UserInterfaceInfoUpdateParam;
-import com.christer.project.model.entity.UserInterfaceInfo;
+import com.christer.myapicommon.model.entity.UserInterfaceInfo;
 
 import java.util.List;
 

@@ -36,5 +36,9 @@ public final class WebURLConstant {
     public static final String URI_OUTLINE = "/outline";
     public static final String URI_INVOKE = "/invoke";
 
+    public static final String URI_ANALYSIS = "/analysis";
+
+    public static final String URL_TOP_INTERFACE_INVOKE = "/top/interface/invoke";
+
 
 }

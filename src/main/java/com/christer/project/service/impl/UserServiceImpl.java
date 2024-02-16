@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.christer.myapicommon.model.entity.UserEntity;
 import com.christer.project.common.ResultCode;
 import com.christer.project.exception.BusinessException;
 import com.christer.project.exception.ThrowUtils;
@@ -16,7 +17,7 @@ import com.christer.project.model.dto.user.UserLoginParam;
 import com.christer.project.model.dto.user.UserQueryParam;
 import com.christer.project.model.dto.user.UserRegisterParam;
 import com.christer.project.model.dto.user.UserUpdateParam;
-import com.christer.project.model.entity.UserEntity;
+
 import com.christer.project.model.vo.UserInfoVO;
 import com.christer.project.service.UserService;
 import com.christer.project.util.BeanCopyUtil;

@@ -19,4 +19,6 @@ package com.christer.project.provider;
 public interface DemoService {
 
     String sayHello(String name);
+
+    String sayHello2(String name);
 }

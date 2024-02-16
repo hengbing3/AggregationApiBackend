@@ -1,8 +1,11 @@
 package com.christer.project.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.christer.project.model.entity.UserInterfaceInfo;
+import com.christer.myapicommon.model.entity.UserInterfaceInfo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author Christer
@@ -13,6 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UserInterfaceInfoMapper extends BaseMapper<UserInterfaceInfo> {
 
+    List<UserInterfaceInfo> listTopInvokeInterfaceInfo(@Param("limit") Integer limit);
 }
 
 

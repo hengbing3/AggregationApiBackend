@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.christer.myapiclientsdk.client.MyApiClient;
 import com.christer.myapiclientsdk.model.User;
+import com.christer.myapicommon.model.entity.InterfaceInfo;
+import com.christer.myapicommon.model.entity.UserEntity;
 import com.christer.project.common.ResultCode;
 import com.christer.project.exception.BusinessException;
 import com.christer.project.exception.ThrowUtils;
@@ -14,8 +16,7 @@ import com.christer.project.mapper.UserMapper;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoInvokeParam;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoParam;
 import com.christer.project.model.dto.interfaceinfo.QueryInterfaceInfoParam;
-import com.christer.project.model.entity.InterfaceInfo;
-import com.christer.project.model.entity.UserEntity;
+
 import com.christer.project.model.enums.InterfaceInfoStatusEnum;
 import com.christer.project.service.InterfaceInfoService;
 import com.christer.project.util.ValidateUtil;

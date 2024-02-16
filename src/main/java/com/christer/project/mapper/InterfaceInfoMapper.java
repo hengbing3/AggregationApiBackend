@@ -1,7 +1,7 @@
 package com.christer.project.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.christer.project.model.entity.InterfaceInfo;
+import com.christer.myapicommon.model.entity.InterfaceInfo;
 
 
 /**

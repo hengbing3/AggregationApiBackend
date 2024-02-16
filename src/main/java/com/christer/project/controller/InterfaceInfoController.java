@@ -11,7 +11,9 @@ import com.christer.project.constant.CommonConstant;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoInvokeParam;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoParam;
 import com.christer.project.model.dto.interfaceinfo.QueryInterfaceInfoParam;
-import com.christer.project.model.entity.InterfaceInfo;
+
+
+import com.christer.myapicommon.model.entity.InterfaceInfo;
 import com.christer.project.service.InterfaceInfoService;
 import com.christer.project.util.ValidateGroup;
 import io.swagger.annotations.ApiOperation;

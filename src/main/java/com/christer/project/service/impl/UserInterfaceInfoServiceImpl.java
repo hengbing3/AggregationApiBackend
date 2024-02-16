@@ -16,7 +16,7 @@ import com.christer.project.model.dto.userinterfaceinfo.QueryUserInterfaceInfoPa
 import com.christer.project.model.dto.userinterfaceinfo.UserInterfaceInfoAddParam;
 import com.christer.project.model.dto.userinterfaceinfo.UserInterfaceInfoUpdateParam;
 import com.christer.project.model.entity.InterfaceInfo;
-import com.christer.project.model.entity.UserInterfaceInfo;
+import com.christer.myapicommon.model.entity.UserInterfaceInfo;
 import com.christer.project.service.UserInterfaceInfoService;
 import com.christer.project.util.ValidateUtil;
 import lombok.RequiredArgsConstructor;
@@ -97,9 +97,9 @@ public class UserInterfaceInfoServiceImpl extends ServiceImpl<UserInterfaceInfoM
         final LambdaQueryWrapper<UserInterfaceInfo> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(UserInterfaceInfo::getInterfaceInfoId, interfaceInfoId)
                 .eq(UserInterfaceInfo::getUserId, userId);
-        // TODO 校验接口剩余请求次数
         UserInterfaceInfo currentInfo = userInterfaceInfoMapper.selectOne(queryWrapper);
         ThrowUtils.throwIf(currentInfo == null, "当前用户调用接口信息不存在！");
+        ThrowUtils.throwIf(Objects.requireNonNull(currentInfo).getLeftNum() <= 0, "该接口剩余调用次数不足！");
         int update = 0;
         // 加锁
         final String key = interfaceInfoId + ":" + userId;

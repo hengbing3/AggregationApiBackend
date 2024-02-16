@@ -2,7 +2,8 @@ package com.christer.project.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.christer.project.model.entity.UserEntity;
+
+import com.christer.myapicommon.model.entity.UserEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

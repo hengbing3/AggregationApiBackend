@@ -59,6 +59,11 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         //分页参数
         final Page<InterfaceInfo> rowPage = new Page<>(interfaceInfoParam.getCurrentPage(), interfaceInfoParam.getPageSize());
         final LambdaQueryWrapper<InterfaceInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(StringUtils.hasText(interfaceInfoParam.getName()), InterfaceInfo::getName, interfaceInfoParam.getName())
+                .like(StringUtils.hasText(interfaceInfoParam.getDescription()), InterfaceInfo::getDescription, interfaceInfoParam.getDescription())
+                .eq(StringUtils.hasText(interfaceInfoParam.getUrl()), InterfaceInfo::getUrl, interfaceInfoParam.getUrl())
+                .eq(StringUtils.hasText(interfaceInfoParam.getMethod()), InterfaceInfo::getMethod, interfaceInfoParam.getMethod())
+                .eq(!Objects.isNull(interfaceInfoParam.getStatus()), InterfaceInfo::getStatus, interfaceInfoParam.getStatus());
         return interfaceInfoMapper.selectPage(rowPage, queryWrapper);
     }
 

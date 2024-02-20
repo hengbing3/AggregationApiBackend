@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -45,7 +46,6 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 
     private final UserMapper userMapper;
 
-    private final MyApiClient myApiClient;
 
     @Override
     public boolean addInterFaceInfo(InterfaceInfoParam interfaceInfo) {
@@ -91,8 +91,8 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         // 获取接口信息
         InterfaceInfo interfaceInfo = interfaceInfoMapper.selectById(id);
         ThrowUtils.throwIf(null == interfaceInfo, "接口信息不存在！");
+        final MyApiClient myApiClient = getMyApiClient(currentUserId);
         // 判断接口是否能够调用
-        // TODO 目前模拟的接口sdk里的代码写死了，我们后续再优化
         User user = new User();
         user.setUsername("加油上线！！！");
         String result = myApiClient.getUsernameByPost(user);
@@ -108,6 +108,16 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         return interfaceInfoMapper.updateById(updateInterfaceInfo) > 0;
     }
 
+    @NotNull
+    private MyApiClient getMyApiClient(Long currentUserId) {
+        // 获取用户信息
+        final UserEntity userEntity = userMapper.selectById(currentUserId);
+        ThrowUtils.throwIf(null == userEntity, "用户信息不存在！");
+        // 根据用户信息获取 accessKey 和 secretKey
+        // 获取api客户端并调用接口
+        return new MyApiClient(userEntity.getAccessKey(), userEntity.getSecretKey());
+    }
+
     @Override
     public boolean outlineInterfaceInfo(Long id, Long currentUserId) {
         Objects.requireNonNull(id, "接口id不存在！");
@@ -116,9 +126,9 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         InterfaceInfo interfaceInfo = interfaceInfoMapper.selectById(id);
         ThrowUtils.throwIf(null == interfaceInfo, "接口信息不存在！");
         // 判断接口是否能够调用
-        // TODO 目前模拟的接口sdk里的代码写死了，我们后续再优化
         User user = new User();
         user.setUsername("加油下线！！！");
+        final MyApiClient myApiClient = getMyApiClient(currentUserId);
         String result = myApiClient.getUsernameByPost(user);
         if (!StringUtils.hasText(result)) {
             throw new BusinessException(ResultCode.FAILED, "接口调用失败！");

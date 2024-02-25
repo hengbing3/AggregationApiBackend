@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @author Christer
@@ -25,4 +26,8 @@ public class InterfaceInfoInvokeParam {
      * 用户请求参数
      */
     private String userRequestParams;
+    /**
+     * 请求头
+     */
+    private List<HeaderObject> headers;
 }

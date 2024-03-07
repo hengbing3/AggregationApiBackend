@@ -9,6 +9,9 @@ import cn.hutool.json.JSONUtil;
 import com.christer.myapiclientsdk.model.User;
 import com.christer.myapiclientsdk.uitls.SignUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -22,6 +25,8 @@ public class MyApiClient {
     private final String accessKey;
 
     private final String secretKey;
+
+    public static final String GATEWAY_HOST = "http://localhost:8090";
 
     public MyApiClient(String accessKey, String secretKey) {
         this.accessKey = accessKey;
@@ -38,7 +43,7 @@ public class MyApiClient {
         // 可以单独传入http参数，这样参数会自动做URL编码，拼接在URL中
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("name", name);
-        String result = HttpUtil.get("http://localhost:8213/api/name/", hashMap);
+        String result = HttpUtil.get(GATEWAY_HOST + "/api/name/", hashMap);
         log.info(result);
         return result;
     }
@@ -52,7 +57,7 @@ public class MyApiClient {
     public String getNameByPost(String name) {
         final HashMap<String, Object> paramMap = new HashMap<>();
         paramMap.put("name", name);
-        String result = HttpUtil.post("http://localhost:8213/api/name/", paramMap);
+        String result = HttpUtil.post(GATEWAY_HOST + "/api/name/", paramMap);
         log.info(result);
         return result;
     }
@@ -86,14 +91,35 @@ public class MyApiClient {
      */
     public String getUsernameByPost(User user) {
         String jsonStr = JSONUtil.toJsonStr(user);
-        HttpResponse httpResponse = HttpRequest.post("http://localhost:8213/api/name/user")
+        final HttpRequest httpRequest = HttpRequest.post(GATEWAY_HOST + "/api/name/user")
                 .addHeaders(getHeaderMap(jsonStr))
                 .charset(StandardCharsets.UTF_8)
-                .body(jsonStr)
-                .execute();
-        log.info("响应状态码:{}", httpResponse.getStatus());
-        final String result = httpResponse.body();
-        log.info(result);
+                .body(jsonStr);
+        String result = "";
+        try (final HttpResponse httpResponse = httpRequest.execute()) {
+            log.info("响应状态码:{}", httpResponse.getStatus());
+            result = httpResponse.body();
+            if (httpResponse.getStatus() != 200) {
+                result = "服务器内部错误:" + extractErrorMessage(result);
+            }
+            log.info(result);
+        } catch (Exception e) {
+            log.error("响应发生异常:", e);
+            throw new RuntimeException("响应失败:" + e.getMessage());
+        }
         return result;
+    }
+
+    public String extractErrorMessage(String html) {
+        Document doc = Jsoup.parse(html);
+        // 尝试根据具体的HTML结构来提取错误信息
+        Element errorElement = doc.select("div[style='white-space:pre-wrap;']").first();
+        if (errorElement != null) {
+            // 返回错误信息文本
+            return errorElement.text();
+        } else {
+            // 如果找不到指定元素，返回默认错误信息或进行其他处理
+            return "未能解析错误信息" + html;
+        }
     }
 }

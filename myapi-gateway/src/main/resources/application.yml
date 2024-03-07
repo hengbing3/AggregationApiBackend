@@ -1,0 +1,133 @@
+server:
+  port: 8090
+
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: test_router
+#          uri: https://www.codefather.cn/%E7%BC%96%E7%A8%8B%E5%AF%BC%E8%88%AA/
+#          predicates:
+#            - After=2024-02-10T17:00:00+08:00[Asia/Shanghai]
+#            - Before=2024-02-10T17:14:00+08:00[Asia/Shanghai]
+#            - Between=2024-02-10T17:14:00.012+08:00[Asia/Shanghai], 2024-02-10T17:23:03.012+08:00[Asia/Shanghai]
+
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: host_route
+#          uri: https://www.codefather.cn/%E7%BC%96%E7%A8%8B%E5%AF%BC%E8%88%AA/
+#          predicates:
+#            - Host=**.checkcodeagain.club
+
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: path_route
+#          uri: http://localhost:8101
+#          predicates:
+#            - Path=/api/**
+
+# 灰度发布，设置权重
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: weight_high
+#          uri: http://localhost:8101/api/user/info
+#          predicates:
+#            - Weight=group1, 8
+#        - id: weight_low
+#          uri: http://localhost:8101/api/interfaceInfo
+#          predicates:
+#            - Weight=group1, 2
+
+# 添加请求参数
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: add_request_parameter_route
+#          uri: http://localhost:8101
+#          predicates:
+#            - Path=/api/**
+#          filters:
+#            - AddRequestParameter=id, 1
+
+# 添加请求头
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: add_request_header_route
+#          uri: http://localhost:8213
+#          predicates:
+#            - Path=/api/**
+#          filters:
+#            - AddRequestHeader=christer, good!!!
+
+# 降级
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: circuitbreaker_route
+#          uri: http://localhost:8213
+#          predicates:
+#            - Path=/api/**
+#          filters:
+#            - name: CircuitBreaker
+#              args:
+#                name: myCircuitBreaker
+#                fallbackUri: forward:/fallback
+#        - id: my-fallback
+#          uri: https://yupi.icu
+#          predicates:
+#            - Path=/fallback
+
+# 重试
+spring:
+  cloud:
+    gateway:
+      default-filters:
+        - AddResponseHeader=X-Response-Default-Red, Default-Blue
+      routes:
+        - id: retry_route
+          uri: http://localhost:8213
+          predicates:
+            - Path=/api/**
+          filters:
+            - name: Retry
+              args:
+                retries: 3
+                statuses: INTERNAL_SERVER_ERROR
+                methods: GET,POST
+                backoff:
+                  firstBackoff: 10ms
+                  maxBackoff: 50ms
+                  factor: 2
+                  basedOnPreviousValue: false
+
+# 设定好日志级别
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: info
+
+
+# 以下配置指定了应用的名称、使用的协议（Dubbo-RPC实现框架）、注册中心的类型（Nacos）和地址
+dubbo:
+  application:
+    name: dubbo-springboot-demo-consumer
+  # 指定使用 Dubbo 协议，且端口设置为 -1，表示随机分配可用端口
+  protocol:
+    name: dubbo
+    port: 22223
+  # 配置注册中心为 Nacos，使用的地址是 nacos://localhost:8848
+  registry:
+    id: nacos-registry
+    address: nacos://localhost:8848

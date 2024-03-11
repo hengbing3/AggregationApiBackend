@@ -1,10 +1,7 @@
 package com.christer.project.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.christer.project.model.dto.user.UserLoginParam;
-import com.christer.project.model.dto.user.UserQueryParam;
-import com.christer.project.model.dto.user.UserRegisterParam;
-import com.christer.project.model.dto.user.UserUpdateParam;
+import com.christer.project.model.dto.user.*;
 import com.christer.project.model.vo.UserInfoVO;
 
 /**
@@ -48,4 +45,11 @@ public interface UserService {
      * @return
      */
     boolean updateUserInfo(UserUpdateParam userUpdateParam);
+
+    /**
+     * 修改密码
+     * @param changePasswordParam 请求参数
+     * @return flag
+     */
+    Boolean changePassword(ChangePasswordParam changePasswordParam);
 }

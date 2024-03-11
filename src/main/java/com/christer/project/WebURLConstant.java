@@ -26,6 +26,9 @@ public final class WebURLConstant {
     public static final String URI_USER_PAGE = URI_USER + URI_PAGE;
 
     public static final String URI_POST = "/post";
+    public static final String URI_DEPARTMENT = "/department";
+
+    public static final String URI_USER_GROUP = "/userGroup";
 
     public static final String URI_POST_PAGE = URI_POST + URI_PAGE;
 

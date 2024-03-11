@@ -7,10 +7,7 @@ import com.christer.project.common.CommonResult;
 import com.christer.project.common.ResultBody;
 import com.christer.project.common.ResultCode;
 import com.christer.project.config.SessionServiceConfig;
-import com.christer.project.model.dto.user.UserLoginParam;
-import com.christer.project.model.dto.user.UserQueryParam;
-import com.christer.project.model.dto.user.UserRegisterParam;
-import com.christer.project.model.dto.user.UserUpdateParam;
+import com.christer.project.model.dto.user.*;
 import com.christer.project.model.vo.UserInfoVO;
 import com.christer.project.service.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -60,6 +57,14 @@ public class UserController extends AbstractSessionController {
         final UserInfoVO userInfoVO = userService.loginUser(userParam);
         sessionService.login(userInfoVO);
         return ResultBody.success(sessionService.getCurrentUserInfo().getToken());
+    }
+
+    @PutMapping(WebURLConstant.URI_USER + "/changePassword")
+    @ApiOperation("修改密码")
+    public CommonResult<Void> changePassWord(@RequestBody @Validated ChangePasswordParam changePasswordParam) {
+        log.info("user change password:{}", changePasswordParam);
+        final Boolean flag = userService.changePassword(changePasswordParam);
+        return Boolean.TRUE.equals(flag) ? ResultBody.success() : ResultBody.failed(ResultCode.FAILED);
     }
 
     @PostMapping(WebURLConstant.URI_USER_LOGOUT)

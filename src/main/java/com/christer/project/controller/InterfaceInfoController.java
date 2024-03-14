@@ -4,6 +4,7 @@ package com.christer.project.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyParam;
 import com.christer.project.WebURLConstant;
 import com.christer.project.common.CommonResult;
 import com.christer.project.common.ResultBody;
@@ -157,6 +158,19 @@ public class InterfaceInfoController extends AbstractSessionController {
         Long currentUserId = getCurrentUserId();
         final Object invokeResult = interfaceInfoService.invokeInterfaceInfo(param, currentUserId);
         return ResultBody.success(invokeResult);
+    }
+
+    /**
+     * 接口申请
+     */
+    @PostMapping(WebURLConstant.URI_APPLY)
+    @SaCheckRole(CommonConstant.USER_ROLE)
+    public CommonResult<Void> applyInterfaceInfo(@RequestBody @Validated InterfaceInfoApplyParam param) {
+        log.info("接口申请，请求参数:{}", param);
+        param.setCreateUserId(getCurrentUserId());
+        return interfaceInfoService.applyInterfaceInfo(param) ?
+                ResultBody.success() :
+                ResultBody.failed(FAILED.getCode(), FAILED.getMessage());
     }
 }
 

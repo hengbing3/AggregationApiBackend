@@ -1,11 +1,14 @@
 package com.christer.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.christer.myapiclientsdk.client.MyApiClient;
 import com.christer.myapiclientsdk.model.User;
+import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyParam;
 import com.christer.myapicommon.model.entity.InterfaceInfo;
 import com.christer.myapicommon.model.entity.UserEntity;
 import com.christer.project.common.ResultCode;
@@ -25,10 +28,13 @@ import com.google.gson.JsonSyntaxException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -46,7 +52,8 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 
     private final UserMapper userMapper;
 
-
+    @Value("${default-flowable-ui-service}")
+    private String flowableServiceUI;
     @Override
     public boolean addInterFaceInfo(InterfaceInfoParam interfaceInfo) {
         InterfaceInfo info = BeanUtil.copyProperties(interfaceInfo, InterfaceInfo.class);
@@ -169,5 +176,30 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         final String usernameByPost = myClient.getUsernameByPost(user);
         log.info("调用结果：{}", usernameByPost);
         return usernameByPost;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean applyInterfaceInfo(final InterfaceInfoApplyParam param) {
+        // 参数校验
+        ValidateUtil.validateBean(param);
+        // 根据流程的key 启动工作流
+        final HashMap<String, String> headParam = new HashMap<>();
+        headParam.put("processInstanceKey", "xxx");
+        headParam.put("assigneeUser", String.valueOf(param.getCreateUserId()));
+
+        final HttpResponse response = HttpRequest.post(flowableServiceUI + "/startAndCompleteTask")
+                .addHeaders(headParam)
+                .execute();
+        if (response.getStatus() != 200) {
+            throw new BusinessException("工作流启动失败！");
+        }
+        final String body = response.body();
+
+        // 工作流返回结果
+        // 新增接口申请记录
+        // 新增接口审核记录
+
+        return false;
     }
 }

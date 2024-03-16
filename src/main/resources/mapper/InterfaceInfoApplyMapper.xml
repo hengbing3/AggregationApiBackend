@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.christer.project.mapper.InterfaceInfoApplyMapper">
+
+    <insert id="insertInterfaceInfoApplyRecord">
+        INSERT INTO t_interface_info_apply_record (
+            interface_info_apply_id,
+            process_node,
+            process_node_id,
+            audit_result,
+            audit_user_id,
+            create_user_id,
+            update_user_id
+        )
+        VALUES (
+                   #{interfaceInfoApplyId},
+                   #{processNode},
+                   #{processNodeId},
+                   #{auditResult},
+                   #{auditUserId},
+                   #{createUserId},
+                   #{createUserId}
+               )
+    </insert>
+    <select id="selectApplyRecordList"
+            resultType="com.christer.myapicommon.model.vo.InterfaceInfoApplyRecordVO">
+        SELECT id,
+               interface_info_apply_id,
+               process_node,
+               process_node_id,
+               audit_result,
+               audit_user_id,
+               (select user_name from user where id = audit_user_id) as auditUserName,
+               (select user_name from user where id = create_user_id) as createUserName,
+               create_user_id,
+               update_user_id,
+               create_time,
+               update_time
+        FROM t_interface_info_apply_record
+        WHERE interface_info_apply_id = #{interfaceInfoApplyId}
+        and deleted_flag = '0'
+    </select>
+</mapper>

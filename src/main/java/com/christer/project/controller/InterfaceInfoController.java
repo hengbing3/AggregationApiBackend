@@ -5,6 +5,8 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyParam;
+import com.christer.myapicommon.model.entity.InterfaceInfoApplyRecord;
+import com.christer.myapicommon.model.vo.InterfaceInfoApplyRecordVO;
 import com.christer.project.WebURLConstant;
 import com.christer.project.common.CommonResult;
 import com.christer.project.common.ResultBody;
@@ -23,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.christer.project.common.ResultCode.*;
 
@@ -171,6 +175,15 @@ public class InterfaceInfoController extends AbstractSessionController {
         return interfaceInfoService.applyInterfaceInfo(param) ?
                 ResultBody.success() :
                 ResultBody.failed(FAILED.getCode(), FAILED.getMessage());
+    }
+
+    /**
+     * 接口申请-历史流程记录
+     */
+    @GetMapping(WebURLConstant.URI_HISTORY)
+    public CommonResult<List<InterfaceInfoApplyRecordVO>> getHistoryList(@RequestParam Long interfaceInfoApplyId) {
+        log.info("接口申请-历史流程记录，请求参数:{}", interfaceInfoApplyId);
+        return ResultBody.success(interfaceInfoService.getHistoryList(interfaceInfoApplyId));
     }
 }
 

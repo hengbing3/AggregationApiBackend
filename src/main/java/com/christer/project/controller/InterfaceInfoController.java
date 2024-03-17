@@ -5,7 +5,9 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyParam;
-import com.christer.myapicommon.model.entity.InterfaceInfoApplyRecord;
+import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyQueryParam;
+import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApproveParam;
+import com.christer.myapicommon.model.entity.InterfaceInfoApply;
 import com.christer.myapicommon.model.vo.InterfaceInfoApplyRecordVO;
 import com.christer.project.WebURLConstant;
 import com.christer.project.common.CommonResult;
@@ -178,12 +180,53 @@ public class InterfaceInfoController extends AbstractSessionController {
     }
 
     /**
+     * 接口审核
+     */
+    @PostMapping(WebURLConstant.URI_APPROVE)
+    @SaCheckRole(CommonConstant.ADMIN_ROLE)
+    public CommonResult<Void> approveInterfaceInfo(@RequestBody @Validated InterfaceInfoApproveParam param) {
+        log.info("接口审核，请求参数:{}", param);
+        param.setAuditUserId(getCurrentUserId());
+        return interfaceInfoService.approveInterfaceInfo(param) ?
+                ResultBody.success() :
+                ResultBody.failed(FAILED.getCode(), FAILED.getMessage());
+    }
+
+    /**
      * 接口申请-历史流程记录
      */
-    @GetMapping(WebURLConstant.URI_HISTORY)
+    @GetMapping(WebURLConstant.URI_APPLY_HISTORY)
     public CommonResult<List<InterfaceInfoApplyRecordVO>> getHistoryList(@RequestParam Long interfaceInfoApplyId) {
         log.info("接口申请-历史流程记录，请求参数:{}", interfaceInfoApplyId);
         return ResultBody.success(interfaceInfoService.getHistoryList(interfaceInfoApplyId));
     }
+
+    /**
+     * 接口申请-待办信息
+     */
+    @SaCheckRole(CommonConstant.ADMIN_ROLE)
+    @PostMapping(WebURLConstant.URI_APPLY_TODO)
+    public CommonResult<Page<InterfaceInfoApply>> getTodoPage(@RequestBody @Validated InterfaceInfoApplyQueryParam param) {
+        log.info("查询代办任务:{}",param);
+        param.setCurrentUserId(getCurrentUserId());
+        final Page<InterfaceInfoApply> page = interfaceInfoService.getTodoPage(param);
+        return ResultBody.success(page);
+    }
+
+    /**
+     * 接口申请-已办信息
+     */
+    @SaCheckRole(CommonConstant.ADMIN_ROLE)
+    @PostMapping(WebURLConstant.URI_APPLY_DONE)
+    public CommonResult<Page<InterfaceInfoApply>> getDonePage(@RequestBody @Validated InterfaceInfoApplyQueryParam param)
+    {
+        log.info("查询已办任务:{}",param);
+        param.setCurrentUserId(getCurrentUserId());
+        final Page<InterfaceInfoApply> page = interfaceInfoService.getDonePage(param);
+        return ResultBody.success(page);
+    }
+
+
+
 }
 

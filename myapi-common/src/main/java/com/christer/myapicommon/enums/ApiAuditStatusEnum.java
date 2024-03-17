@@ -16,19 +16,26 @@ public enum ApiAuditStatusEnum {
 
 
     /**
-     * 审核中
+     * API审核中
      */
-    AUDITING("0", "审核中"),
+    AUDITING("0", "API审核中"),
+    /**
+     * API开放审核中
+     */
+    API_OPEN_AUDITING("1", "API开放审核中"),
 
     /**
-     * 审核通过
+     * API审核不通过
      */
-    PASS("1", "审核通过"),
-
+    API_AUDIT_NOT_PASS("2", "API审核不通过"),
     /**
-     * 审核不通过
+     * API开放不通过
      */
-    NOT_PASS("2", "审核不通过");
+    API_OPEN_NOT_PASS("3","API开放不通过"),
+    /**
+     * API申请通过
+     */
+    API_APPLY_PASS("4","API申请通过");
 
     private String code;
 

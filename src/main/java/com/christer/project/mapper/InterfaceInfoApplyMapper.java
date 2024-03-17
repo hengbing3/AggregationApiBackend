@@ -1,6 +1,7 @@
 package com.christer.project.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyQueryParam;
 import com.christer.myapicommon.model.entity.InterfaceInfoApply;
 import com.christer.myapicommon.model.entity.InterfaceInfoApplyRecord;
 import com.christer.myapicommon.model.vo.InterfaceInfoApplyRecordVO;
@@ -29,4 +30,32 @@ public interface InterfaceInfoApplyMapper extends BaseMapper<InterfaceInfoApply>
      * @return
      */
     List<InterfaceInfoApplyRecordVO> selectApplyRecordList(@Param("interfaceInfoApplyId") Long interfaceInfoApplyId);
+
+    /**
+     * 获取待办接口申请数量
+     * @param param
+     * @return
+     */
+    int selectApplyCount(InterfaceInfoApplyQueryParam param);
+
+    /**
+     * 获取待办接口申请列表
+     * @param param
+     * @return
+     */
+    List<InterfaceInfoApply> selectListByCondition(InterfaceInfoApplyQueryParam param);
+
+    /**
+     * 获取已办数量
+     * @param param
+     * @return
+     */
+    int selectApplyDoneCount(InterfaceInfoApplyQueryParam param);
+
+    /**
+     * 获取已办接口申请列表
+     * @param param
+     * @return
+     */
+    List<InterfaceInfoApply> selectApplyDoneList(InterfaceInfoApplyQueryParam param);
 }

@@ -44,6 +44,10 @@ public class InterfaceInfoApplyRecord {
      * 0：不通过
      */
     private String auditResult;
+    /**
+     * 审核意见
+     */
+    private String auditOpinion;
 
     /**
      * 审核用户ID

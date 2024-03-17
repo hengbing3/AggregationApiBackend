@@ -1,27 +1,33 @@
 package com.christer.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestAlgorithm;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.christer.myapiclientsdk.client.MyApiClient;
 import com.christer.myapiclientsdk.model.User;
-import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyParam;
-import com.christer.myapicommon.model.entity.InterfaceInfo;
-import com.christer.myapicommon.model.entity.UserEntity;
+import com.christer.myapicommon.enums.ApiAuditStatusEnum;
+import com.christer.myapicommon.model.dto.interfaceinfo.*;
+import com.christer.myapicommon.model.entity.*;
+import com.christer.myapicommon.model.vo.InterfaceInfoApplyRecordVO;
 import com.christer.project.common.ResultCode;
 import com.christer.project.exception.BusinessException;
 import com.christer.project.exception.ThrowUtils;
+import com.christer.project.mapper.InterfaceInfoApplyMapper;
 import com.christer.project.mapper.InterfaceInfoMapper;
 import com.christer.project.mapper.UserMapper;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoInvokeParam;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoParam;
 import com.christer.project.model.dto.interfaceinfo.QueryInterfaceInfoParam;
-
 import com.christer.project.model.enums.InterfaceInfoStatusEnum;
 import com.christer.project.service.InterfaceInfoService;
+import com.christer.project.util.EncryptUtil;
 import com.christer.project.util.ValidateUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -31,11 +37,15 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
+
+import static com.christer.myapicommon.common.CommonConstant.API_OPEN_AUDIT_KEY;
+import static com.christer.myapicommon.common.CommonConstant.FLOWABLE_SALT;
+import static com.christer.myapicommon.enums.ApiAuditResultEnum.PASS;
+import static com.christer.myapicommon.enums.ApiAuditStatusEnum.*;
 
 /**
  * @author Christer
@@ -52,8 +62,11 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 
     private final UserMapper userMapper;
 
+    private final InterfaceInfoApplyMapper interfaceInfoApplyMapper;
+
     @Value("${default-flowable-ui-service}")
     private String flowableServiceUI;
+
     @Override
     public boolean addInterFaceInfo(InterfaceInfoParam interfaceInfo) {
         InterfaceInfo info = BeanUtil.copyProperties(interfaceInfo, InterfaceInfo.class);
@@ -185,21 +198,157 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         ValidateUtil.validateBean(param);
         // 根据流程的key 启动工作流
         final HashMap<String, String> headParam = new HashMap<>();
-        headParam.put("processInstanceKey", "xxx");
-        headParam.put("assigneeUser", String.valueOf(param.getCreateUserId()));
-
-        final HttpResponse response = HttpRequest.post(flowableServiceUI + "/startAndCompleteTask")
+        final FlowableStartParam flowableStartParam = new FlowableStartParam();
+        flowableStartParam.setProcessInstanceKey(API_OPEN_AUDIT_KEY);
+        flowableStartParam.setAssigneeUser(String.valueOf(param.getCreateUserId()));
+        final String jsonStr = JSONUtil.toJsonStr(flowableStartParam);
+        final String sign = EncryptUtil.getDigestSign(jsonStr, FLOWABLE_SALT);
+        headParam.put("sign", sign);
+        // 启动工作流并完成任务
+        final HttpResponse response = HttpRequest.post(flowableServiceUI + "/process/startAndCompleteTask")
                 .addHeaders(headParam)
+                .body(jsonStr, "application/json;charset=utf-8")
                 .execute();
         if (response.getStatus() != 200) {
+            log.error("工作流执行错误：{}", response.body());
             throw new BusinessException("工作流启动失败！");
         }
-        final String body = response.body();
-
         // 工作流返回结果
+        final String body = response.body();
+        final FlowableInfo flowableInfo = JSONUtil.toBean(body, FlowableInfo.class);
+        final InterfaceInfoApply interfaceInfoApply = BeanUtil.copyProperties(param, InterfaceInfoApply.class);
+        interfaceInfoApply.setProcessInstanceId(flowableInfo.getProcessInstanceId());
+        interfaceInfoApply.setAuditStatus(AUDITING.getCode());
         // 新增接口申请记录
+        interfaceInfoApplyMapper.insert(interfaceInfoApply);
         // 新增接口审核记录
+        final InterfaceInfoApplyRecord interfaceInfoApplyRecord = new InterfaceInfoApplyRecord();
+        interfaceInfoApplyRecord.setInterfaceInfoApplyId(interfaceInfoApply.getId());
+        interfaceInfoApplyRecord.setProcessNode(flowableInfo.getTaskName());
+        interfaceInfoApplyRecord.setProcessNodeId(flowableInfo.getTaskId());
+        interfaceInfoApplyRecord.setAuditResult(PASS.getCode());
+        interfaceInfoApplyRecord.setCreateUserId(Long.valueOf(flowableInfo.getAssignee()));
 
-        return false;
+        return interfaceInfoApplyMapper.insertInterfaceInfoApplyRecord(interfaceInfoApplyRecord) > 0;
+    }
+
+    @Override
+    public List<InterfaceInfoApplyRecordVO> getHistoryList(final Long interfaceInfoApplyId) {
+        Assert.notNull(interfaceInfoApplyId, "接口申请记录ID不能为空!");
+
+        final List<InterfaceInfoApplyRecordVO> interfaceInfoApplyRecordList = interfaceInfoApplyMapper.selectApplyRecordList(interfaceInfoApplyId);
+
+        return CollectionUtils.isEmpty(interfaceInfoApplyRecordList) ? Collections.emptyList() : interfaceInfoApplyRecordList;
+    }
+
+    @Override
+    public Page<InterfaceInfoApply> getTodoPage(final InterfaceInfoApplyQueryParam param) {
+        // 获取工作流的代办 流程实例id列表
+        final HttpResponse response = HttpRequest.post(flowableServiceUI + "/process/totoTask?userId=" + param.getCurrentUserId())
+                .execute();
+        if (response.getStatus() != 200) {
+            log.error("获取工作流的代办失败：{}", response.body());
+            throw new BusinessException("无法获取工作流中的代办任务！");
+        }
+        final String body = response.body();
+        final List<String> processInstanceIds = JSONUtil.toList(body, String.class);
+        if (CollectionUtils.isEmpty(processInstanceIds)) {
+            return new Page<>(param.getCurrentPage(), param.getPageSize(), 0);
+        }
+        // 根据流程实例id 分页查询数量
+        final int count = interfaceInfoApplyMapper.selectApplyCount(param);
+        // 根据流程实例id，查询代办信息列表
+        final List<InterfaceInfoApply> list = count > 0 ? interfaceInfoApplyMapper.selectListByCondition(param) : Collections.emptyList();
+        final Page<InterfaceInfoApply> page = new Page<>(param.getCurrentPage(), param.getPageSize());
+        page.setRecords(list);
+        page.setTotal(count);
+        return page;
+    }
+
+    @Override
+    public Page<InterfaceInfoApply> getDonePage(final InterfaceInfoApplyQueryParam param) {
+        // 根据当前用户，去获取已办信息的流程实例id列表
+        final HttpResponse response = HttpRequest.post(flowableServiceUI + "/process/doneTask?userId=" + param.getCurrentUserId())
+                .execute();
+        if (response.getStatus() != 200) {
+            log.error("获取工作流的代办失败：{}", response.body());
+            throw new BusinessException("无法获取工作流中的已办任务！");
+        }
+        final String body = response.body();
+        final List<String> processInstanceIds = JSONUtil.toList(body, String.class);
+        if (CollectionUtils.isEmpty(processInstanceIds)) {
+            return new Page<>(param.getCurrentPage(), param.getPageSize(), 0);
+        }
+        // 根据已获取的流程实例id，获取已办信息列表
+        final int count = interfaceInfoApplyMapper.selectApplyDoneCount(param);
+        // 根据流程实例id，查询代办信息列表
+        final List<InterfaceInfoApply> list = count > 0 ? interfaceInfoApplyMapper.selectApplyDoneList(param) : Collections.emptyList();
+        final Page<InterfaceInfoApply> page = new Page<>(param.getCurrentPage(), param.getPageSize());
+        // 分装并返回page
+        page.setRecords(list);
+        page.setTotal(count);
+        return page;
+
+
+    }
+
+    @Override
+    public boolean approveInterfaceInfo(final InterfaceInfoApproveParam param) {
+        // 获取流程请求参数
+        final FlowableCompleteTaskParam taskParam = new FlowableCompleteTaskParam();
+        taskParam.setAuditResult(param.getAuditResult());
+        taskParam.setCandidateGroupUser(String.valueOf(param.getAuditUserId()));
+        taskParam.setProcessInstanceId(param.getProcessInstanceId());
+        // 封装签名认证
+        final String jsonStr = JSONUtil.toJsonStr(taskParam);
+        final String sign = EncryptUtil.getDigestSignByDigestAlgorithm(jsonStr, FLOWABLE_SALT, DigestAlgorithm.SHA1);
+        final HashMap<String, String> headers = new HashMap<>();
+        headers.put("sign", sign);
+        // 调用工作流，完成审核
+        final HttpResponse response = HttpRequest.post(flowableServiceUI + "/process/completeTask")
+                .addHeaders(headers)
+                .body(jsonStr, "application/json;charset=utf-8")
+                .execute();
+        if (response.getStatus() != 200) {
+            log.error("工作流执行错误：{}", response.body());
+            throw new BusinessException("工作流执行失败-无法完成任务！");
+        }
+        // 工作流返回结果
+        final String body = response.body();
+        final FlowableInfo flowableInfo = JSONUtil.toBean(body, FlowableInfo.class);
+        // 获取流程申请信息
+        final InterfaceInfoApply interfaceInfoApply = interfaceInfoApplyMapper.selectById(param.getId());
+        // 设置审核状态
+        extractedSetAuditStatus(param, interfaceInfoApply);
+        // 新增接口申请记录
+        interfaceInfoApplyMapper.updateById(interfaceInfoApply);
+
+        // 新增接口审核记录
+        final InterfaceInfoApplyRecord interfaceInfoApplyRecord = new InterfaceInfoApplyRecord();
+        interfaceInfoApplyRecord.setInterfaceInfoApplyId(interfaceInfoApply.getId());
+        interfaceInfoApplyRecord.setProcessNode(flowableInfo.getTaskName());
+        interfaceInfoApplyRecord.setProcessNodeId(flowableInfo.getTaskId());
+        interfaceInfoApplyRecord.setAuditResult(param.getAuditResult());
+        interfaceInfoApplyRecord.setAuditOpinion(param.getAuditOpinion());
+        interfaceInfoApplyRecord.setAuditUserId(param.getAuditUserId());
+        interfaceInfoApplyRecord.setCreateUserId(interfaceInfoApply.getCreateUserId());
+
+        return interfaceInfoApplyMapper.insertInterfaceInfoApplyRecord(interfaceInfoApplyRecord) > 0;
+    }
+
+    private static void extractedSetAuditStatus(final InterfaceInfoApproveParam param, final InterfaceInfoApply interfaceInfoApply) {
+        if (StrUtil.equals(interfaceInfoApply.getAuditStatus(), ApiAuditStatusEnum.AUDITING.getCode())) {
+            if (StrUtil.equals(PASS.getCode(), param.getAuditResult())) {
+                interfaceInfoApply.setAuditStatus(API_OPEN_AUDITING.getCode());
+            } else {
+                interfaceInfoApply.setAuditStatus(API_AUDIT_NOT_PASS.getCode());
+            }
+        } else if (StrUtil.equals(interfaceInfoApply.getAuditStatus(), API_OPEN_AUDITING.getCode())) {
+            if (StrUtil.equals(PASS.getCode(), param.getAuditResult())) {
+                interfaceInfoApply.setAuditStatus(API_APPLY_PASS.getCode());
+            } else {
+                interfaceInfoApply.setAuditStatus(API_OPEN_NOT_PASS.getCode());
+            }
+        }
     }
 }

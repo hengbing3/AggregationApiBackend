@@ -1,12 +1,19 @@
 package com.christer.project.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyParam;
+import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyQueryParam;
+import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApproveParam;
 import com.christer.myapicommon.model.entity.InterfaceInfo;
+import com.christer.myapicommon.model.entity.InterfaceInfoApply;
+import com.christer.myapicommon.model.vo.InterfaceInfoApplyRecordVO;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoInvokeParam;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoParam;
 import com.christer.project.model.dto.interfaceinfo.QueryInterfaceInfoParam;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+import java.util.List;
 
 
 /**
@@ -48,4 +55,39 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
      * @return
      */
     Object invokeInterfaceInfo(InterfaceInfoInvokeParam param, Long currentUserId);
+
+    /**
+     * 申请接口
+     * @param param
+     * @return
+     */
+    boolean applyInterfaceInfo(InterfaceInfoApplyParam param);
+
+    /**
+     * 获取接口申请历史流程记录
+     * @param interfaceInfoApplyId
+     * @return
+     */
+    List<InterfaceInfoApplyRecordVO> getHistoryList(Long interfaceInfoApplyId);
+
+    /**
+     * 获取分页代办信息
+     * @param param
+     * @return
+     */
+    Page<InterfaceInfoApply> getTodoPage(InterfaceInfoApplyQueryParam param);
+
+    /**
+     * 获取分页已办信息
+     * @param param
+     * @return
+     */
+    Page<InterfaceInfoApply> getDonePage(InterfaceInfoApplyQueryParam param);
+
+    /**
+     * 审批接口
+     * @param param
+     * @return
+     */
+    boolean approveInterfaceInfo(InterfaceInfoApproveParam param);
 }

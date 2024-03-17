@@ -26,25 +26,43 @@ public class EncryptUtil {
 
     static {
         String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDYrF42hh7Jg08Xko8TEanbH3p3kynY7xCZzlz97rwTIRTO4IglNvWMLIYAkW9JKtcWculN09eFM2NZICxqVE4XxFtkR3MbbhVSBGCaZOdAAmVoeXaobxREmC9WdCYl0Tc3XyR+acfud8dpzvJJyULtj59CuzCoQN5pcYmYKnGtNQIDAQAB";
-        rsa = new RSA("RSA/ECB/PKCS1Padding",null, publicKey);
+        rsa = new RSA("RSA/ECB/PKCS1Padding", null, publicKey);
     }
+
     private EncryptUtil() {
 
     }
 
     /**
      * 生成摘要签名
+     *
      * @param param 请求参数
+     * @param salt  盐值
      * @return 单向加密数据
      */
-    public static String getDigestSign(String param) {
+    public static String getDigestSign(String param, String salt) {
         final Digester digester = DigestUtil.digester(DigestAlgorithm.SHA256);
         // 添加签名到请求头，保证传参不被修改
-        return digester.digestHex(param + SALT);
+        return digester.digestHex(param + salt);
+    }
+
+    /**
+     * 根据算法类型，生成摘要加密
+     *
+     * @param param
+     * @param salt
+     * @param algorithm
+     * @return
+     */
+    public static String getDigestSignByDigestAlgorithm(String param, String salt, DigestAlgorithm algorithm) {
+        final Digester digester = DigestUtil.digester(algorithm);
+        // 添加签名到请求头，保证传参不被修改
+        return digester.digestHex(param + salt);
     }
 
     /**
      * 生成rsa 加密数据
+     *
      * @param jsonStr 需要加密json
      * @return str
      */

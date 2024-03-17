@@ -159,9 +159,9 @@ public class UserServiceImpl implements UserService {
         // 更新用户信息
         UpdateWrapper<UserEntity> userEntityUpdateWrapper = new UpdateWrapper<>();
         LambdaUpdateWrapper<UserEntity> eq = userEntityUpdateWrapper.lambda()
-                .set(UserEntity::getUserName, userUpdateParam.getUserName())
-                .set(UserEntity::getUserAvatar, userUpdateParam.getUserAvatar())
-                .set(UserEntity::getUserProfile, userUpdateParam.getUserProfile())
+                .set(StringUtils.isNotBlank(userUpdateParam.getUserName()), UserEntity::getUserName, userUpdateParam.getUserName())
+                .set(StringUtils.isNotBlank(userUpdateParam.getUserAvatar()), UserEntity::getUserAvatar, userUpdateParam.getUserAvatar())
+                .set(StringUtils.isNotBlank(userUpdateParam.getUserProfile()), UserEntity::getUserProfile, userUpdateParam.getUserProfile())
                 .eq(UserEntity::getId, userUpdateParam.getId())
                 .eq(UserEntity::getDeletedFlag, '0');
         return userMapper.update(null, eq) > 0;
@@ -180,7 +180,7 @@ public class UserServiceImpl implements UserService {
         }
         final LambdaUpdateWrapper<UserEntity> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.set(UserEntity::getUserPassword, encryptPassword)
-                        .eq(UserEntity::getId, changePasswordParam.getId());
+                .eq(UserEntity::getId, changePasswordParam.getId());
         final int update = userMapper.update(null, updateWrapper);
         userEntity.setUserPassword(changePasswordParam.getUserPassword());
         final String jsonStr = JSONUtil.toJsonStr(userEntity);

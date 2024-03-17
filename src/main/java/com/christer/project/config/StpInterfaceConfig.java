@@ -12,6 +12,7 @@ import java.util.List;
  * @version 1.0
  * @date 2024-02-07 12:18
  * Description:
+ * sa-token 注解式权限校验，方法重写
  */
 @Component
 public class StpInterfaceConfig implements StpInterface {

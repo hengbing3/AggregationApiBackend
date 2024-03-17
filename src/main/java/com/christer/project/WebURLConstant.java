@@ -9,6 +9,9 @@ package com.christer.project;
  */
 public final class WebURLConstant {
 
+
+
+
     private WebURLConstant() {
     }
 
@@ -42,6 +45,16 @@ public final class WebURLConstant {
     public static final String URI_ANALYSIS = "/analysis";
 
     public static final String URL_TOP_INTERFACE_INVOKE = "/top/interface/invoke";
+
+    public static final String URI_APPLY = "/apply";
+
+    public static final String URI_APPLY_HISTORY = "/applyHistory";
+
+    public static final String URI_APPLY_TODO = "/applyTodo";
+
+    public static final String URI_APPLY_DONE = "/applyDone";
+
+    public static final String URI_APPROVE = "/approve";
 
 
 }

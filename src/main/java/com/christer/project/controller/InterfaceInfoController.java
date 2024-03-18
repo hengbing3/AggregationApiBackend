@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyParam;
 import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyQueryParam;
 import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApproveParam;
+import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoReApplyParam;
 import com.christer.myapicommon.model.entity.InterfaceInfoApply;
 import com.christer.myapicommon.model.vo.InterfaceInfoApplyRecordVO;
 import com.christer.project.WebURLConstant;
@@ -175,6 +176,19 @@ public class InterfaceInfoController extends AbstractSessionController {
         log.info("接口申请，请求参数:{}", param);
         param.setCreateUserId(getCurrentUserId());
         return interfaceInfoService.applyInterfaceInfo(param) ?
+                ResultBody.success() :
+                ResultBody.failed(FAILED.getCode(), FAILED.getMessage());
+    }
+
+    /**
+     * 重新提交-接口申请
+     */
+    @PostMapping(WebURLConstant.URI_RE_APPLY)
+    @SaCheckRole(CommonConstant.USER_ROLE)
+    public CommonResult<Void> reApplyInterfaceInfo(@RequestBody @Validated InterfaceInfoReApplyParam param) {
+        log.info("重新提交-接口申请，请求参数:{}", param);
+        param.setUpdateUserId(getCurrentUserId());
+        return interfaceInfoService.reApplyInterfaceInfo(param) ?
                 ResultBody.success() :
                 ResultBody.failed(FAILED.getCode(), FAILED.getMessage());
     }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyParam;
 import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyQueryParam;
 import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApproveParam;
+import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoReApplyParam;
 import com.christer.myapicommon.model.entity.InterfaceInfo;
 import com.christer.myapicommon.model.entity.InterfaceInfoApply;
 import com.christer.myapicommon.model.vo.InterfaceInfoApplyRecordVO;
@@ -90,4 +91,11 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
      * @return
      */
     boolean approveInterfaceInfo(InterfaceInfoApproveParam param);
+
+    /**
+     * 重新提交-接口申请
+     * @param param
+     * @return
+     */
+    boolean reApplyInterfaceInfo(InterfaceInfoReApplyParam param);
 }

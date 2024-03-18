@@ -12,6 +12,7 @@ import java.util.List;
  * @version 1.0
  * @date 2024-03-17 14:15
  * Description:
+ * 接口申请-分页查询参数
  */
 @Setter
 @Getter

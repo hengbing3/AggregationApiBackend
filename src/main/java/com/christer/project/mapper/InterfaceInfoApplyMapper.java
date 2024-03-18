@@ -58,4 +58,11 @@ public interface InterfaceInfoApplyMapper extends BaseMapper<InterfaceInfoApply>
      * @return
      */
     List<InterfaceInfoApply> selectApplyDoneList(InterfaceInfoApplyQueryParam param);
+
+    /**
+     * 根据申请id获取流程实例id
+     * @param id
+     * @return
+     */
+    String selectProcessInstanceIdById(@Param("id") Long id);
 }

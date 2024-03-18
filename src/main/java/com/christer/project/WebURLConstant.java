@@ -56,5 +56,7 @@ public final class WebURLConstant {
 
     public static final String URI_APPROVE = "/approve";
 
+    public static final String URI_RE_APPLY = "/reapply";
+
 
 }

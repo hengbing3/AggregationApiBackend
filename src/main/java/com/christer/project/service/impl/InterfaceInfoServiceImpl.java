@@ -299,20 +299,8 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         taskParam.setAuditResult(param.getAuditResult());
         taskParam.setCandidateGroupUser(String.valueOf(param.getAuditUserId()));
         taskParam.setProcessInstanceId(param.getProcessInstanceId());
-        // 封装签名认证
-        final String jsonStr = JSONUtil.toJsonStr(taskParam);
-        final String sign = EncryptUtil.getDigestSignByDigestAlgorithm(jsonStr, FLOWABLE_SALT, DigestAlgorithm.SHA1);
-        final HashMap<String, String> headers = new HashMap<>();
-        headers.put("sign", sign);
-        // 调用工作流，完成审核
-        final HttpResponse response = HttpRequest.post(flowableServiceUI + "/process/completeTask")
-                .addHeaders(headers)
-                .body(jsonStr, "application/json;charset=utf-8")
-                .execute();
-        if (response.getStatus() != 200) {
-            log.error("工作流执行错误：{}", response.body());
-            throw new BusinessException("工作流执行失败-无法完成任务！");
-        }
+        // 调用工作流，完成任务
+        final HttpResponse response = getCompleteTaskResponse(taskParam);
         // 工作流返回结果
         final String body = response.body();
         final FlowableInfo flowableInfo = JSONUtil.toBean(body, FlowableInfo.class);
@@ -333,6 +321,57 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         interfaceInfoApplyRecord.setAuditUserId(param.getAuditUserId());
         interfaceInfoApplyRecord.setCreateUserId(interfaceInfoApply.getCreateUserId());
 
+        return interfaceInfoApplyMapper.insertInterfaceInfoApplyRecord(interfaceInfoApplyRecord) > 0;
+    }
+
+    /**
+     * 调用工作流，完成任务
+     * @param taskParam
+     * @return
+     */
+    private HttpResponse getCompleteTaskResponse(final FlowableCompleteTaskParam taskParam) {
+        // 封装签名认证
+        final String jsonStr = JSONUtil.toJsonStr(taskParam);
+        final String sign = EncryptUtil.getDigestSignByDigestAlgorithm(jsonStr, FLOWABLE_SALT, DigestAlgorithm.SHA1);
+        final HashMap<String, String> headers = new HashMap<>();
+        headers.put("sign", sign);
+        // 调用工作流，完成审核
+        final HttpResponse response = HttpRequest.post(flowableServiceUI + "/process/completeTask")
+                .addHeaders(headers)
+                .body(jsonStr, "application/json;charset=utf-8")
+                .execute();
+        if (response.getStatus() != 200) {
+            log.error("工作流执行错误：{}", response.body());
+            throw new BusinessException("工作流执行失败-无法完成任务！");
+        }
+        return response;
+    }
+
+    @Override
+    public boolean reApplyInterfaceInfo(final InterfaceInfoReApplyParam param) {
+        // 1.参数校验
+        ValidateUtil.validateBean(param);
+        // 2.获取流程实例id
+        final String processInstanceId = interfaceInfoApplyMapper.selectProcessInstanceIdById(param.getId());
+        // 3.根据流程实例id,调用工作流，完成任务
+        final FlowableCompleteTaskParam taskParam = new FlowableCompleteTaskParam();
+        taskParam.setProcessInstanceId(processInstanceId);
+        taskParam.setAssigneeUser(String.valueOf(param.getUpdateUserId()));
+        final HttpResponse response = getCompleteTaskResponse(taskParam);
+        // 工作流返回结果
+        final String body = response.body();
+        final FlowableInfo flowableInfo = JSONUtil.toBean(body, FlowableInfo.class);
+        // 4.更新接口申请表
+        final InterfaceInfoApply interfaceInfoApply = BeanUtil.copyProperties(param, InterfaceInfoApply.class);
+        interfaceInfoApplyMapper.updateById(interfaceInfoApply);
+        // 5.新增接口申请记录表
+        final InterfaceInfoApplyRecord interfaceInfoApplyRecord = new InterfaceInfoApplyRecord();
+        interfaceInfoApplyRecord.setInterfaceInfoApplyId(param.getId());
+        interfaceInfoApplyRecord.setProcessNode(flowableInfo.getTaskName());
+        interfaceInfoApplyRecord.setProcessNodeId(flowableInfo.getTaskId());
+        interfaceInfoApplyRecord.setAuditResult(PASS.getCode());
+        interfaceInfoApplyRecord.setCreateUserId(Long.valueOf(flowableInfo.getAssignee()));
+        // 6.返回结果
         return interfaceInfoApplyMapper.insertInterfaceInfoApplyRecord(interfaceInfoApplyRecord) > 0;
     }
 

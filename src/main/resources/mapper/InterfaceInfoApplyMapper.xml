@@ -130,4 +130,8 @@
         limit #{currentPage}, #{pageSize}
         ORDER BY create_time DESC
     </select>
+    <select id="selectProcessInstanceIdById" resultType="java.lang.String">
+        select process_instance_id from t_interface_info_apply where id = #{id}
+        and deleted_flag = '0'
+    </select>
 </mapper>

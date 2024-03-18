@@ -352,10 +352,13 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         // 1.参数校验
         ValidateUtil.validateBean(param);
         // 2.获取流程实例id
-        final String processInstanceId = interfaceInfoApplyMapper.selectProcessInstanceIdById(param.getId());
+        final InterfaceInfoApply oldInterfaceInfoApply = interfaceInfoApplyMapper.selectById(param.getId());
+        if (!StrUtil.equals(oldInterfaceInfoApply.getAuditStatus(), API_AUDIT_NOT_PASS.getCode()) || !StrUtil.equals(oldInterfaceInfoApply.getAuditStatus(), API_OPEN_NOT_PASS.getCode())) {
+            throw new BusinessException("该流程无法重新提交！");
+        }
         // 3.根据流程实例id,调用工作流，完成任务
         final FlowableCompleteTaskParam taskParam = new FlowableCompleteTaskParam();
-        taskParam.setProcessInstanceId(processInstanceId);
+        taskParam.setProcessInstanceId(oldInterfaceInfoApply.getProcessInstanceId());
         taskParam.setAssigneeUser(String.valueOf(param.getUpdateUserId()));
         final HttpResponse response = getCompleteTaskResponse(taskParam);
         // 工作流返回结果

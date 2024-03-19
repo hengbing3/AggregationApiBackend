@@ -354,7 +354,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         ValidateUtil.validateBean(param);
         // 2.获取流程实例id
         final InterfaceInfoApply oldInterfaceInfoApply = interfaceInfoApplyMapper.selectById(param.getId());
-        if (!StrUtil.equals(oldInterfaceInfoApply.getAuditStatus(), API_AUDIT_NOT_PASS.getCode()) || !StrUtil.equals(oldInterfaceInfoApply.getAuditStatus(), API_OPEN_NOT_PASS.getCode())) {
+        if (!StrUtil.equals(oldInterfaceInfoApply.getAuditStatus(), API_AUDIT_NOT_PASS.getCode()) && !StrUtil.equals(oldInterfaceInfoApply.getAuditStatus(), API_OPEN_NOT_PASS.getCode())) {
             throw new BusinessException("该流程无法重新提交！");
         }
         // 3.根据流程实例id,调用工作流，完成任务
@@ -367,6 +367,8 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         final FlowableInfo flowableInfo = JSONUtil.toBean(body, FlowableInfo.class);
         // 4.更新接口申请表
         final InterfaceInfoApply interfaceInfoApply = BeanUtil.copyProperties(param, InterfaceInfoApply.class);
+        // 更新接口状态
+        interfaceInfoApply.setAuditStatus(AUDITING.getCode());
         interfaceInfoApplyMapper.updateById(interfaceInfoApply);
         // 5.新增接口申请记录表
         final InterfaceInfoApplyRecord interfaceInfoApplyRecord = new InterfaceInfoApplyRecord();

@@ -256,6 +256,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
             return new Page<>(param.getCurrentPage(), param.getPageSize(), 0);
         }
         // 根据流程实例id 分页查询数量
+        param.setProcessInstanceIds(processInstanceIds);
         final int count = interfaceInfoApplyMapper.selectApplyCount(param);
         // 根据流程实例id，查询代办信息列表
         final List<InterfaceInfoApply> list = count > 0 ? interfaceInfoApplyMapper.selectListByCondition(param) : Collections.emptyList();

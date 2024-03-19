@@ -175,6 +175,7 @@ public class InterfaceInfoController extends AbstractSessionController {
     public CommonResult<Void> applyInterfaceInfo(@RequestBody @Validated InterfaceInfoApplyParam param) {
         log.info("接口申请，请求参数:{}", param);
         param.setCreateUserId(getCurrentUserId());
+        param.setUpdateUserId(getCurrentUserId());
         return interfaceInfoService.applyInterfaceInfo(param) ?
                 ResultBody.success() :
                 ResultBody.failed(FAILED.getCode(), FAILED.getMessage());

@@ -127,11 +127,47 @@
         <if test="createUserName != null and createUserName !=''">
             and create_user_id in (select id from user where user_name like concat('%',#{createUserName},'%') and deleted_flag = '0')
         </if>
-        limit #{currentPage}, #{pageSize}
         ORDER BY create_time DESC
+        limit #{start}, #{pageSize}
     </select>
     <select id="selectProcessInstanceIdById" resultType="java.lang.String">
         select process_instance_id from t_interface_info_apply where id = #{id}
         and deleted_flag = '0'
     </select>
+    <select id="selectMyInterfaceInfoApplyCount" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM t_interface_info_apply
+        WHERE deleted_flag = '0'
+        AND create_user_id = #{currentUserId}
+          <include refid="myInterfaceInfoApplyParam"/>
+    </select>
+    <select id="selectMyInterfaceInfoApply"
+            resultType="com.christer.myapicommon.model.vo.InterfaceInfoApplyVO">
+        SELECT id,
+               name,
+               description,
+               method,
+               audit_status,
+               create_time
+        FROM t_interface_info_apply
+        WHERE deleted_flag = '0'
+          AND create_user_id = #{currentUserId}
+        <include refid="myInterfaceInfoApplyParam"/>
+        ORDER BY create_time DESC
+        limit #{start}, #{pageSize}
+    </select>
+    <sql id="myInterfaceInfoApplyParam">
+        <if test="auditStatus != null and auditStatus !=''">
+            AND audit_status = #{auditStatus}
+        </if>
+        <if test="method != null and method !=''">
+            AND method = #{method}
+        </if>
+        <if test="name != null and name !=''">
+            AND name LIKE concat('%',#{name},'%')
+        </if>
+        <if test="description != null and description !=''">
+            AND description concat('%',#{description},'%')
+        </if>
+    </sql>
 </mapper>

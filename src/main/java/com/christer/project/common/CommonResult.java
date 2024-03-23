@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 /**
  * @author Christer
  * @version 1.0
@@ -14,7 +16,7 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
-public class CommonResult<T> {
+public class CommonResult<T> implements Serializable {
 
     // 自定义状态码
     private Integer code;
@@ -25,14 +27,14 @@ public class CommonResult<T> {
 
     private static final long serialVersionUID = 1545698833843378645L;
 
-    public CommonResult() {}
+    public CommonResult() {
+    }
 
     public CommonResult(Integer code, String message, T data) {
         this.code = code;
         this.message = message;
         this.data = data;
     }
-
 
 
 }

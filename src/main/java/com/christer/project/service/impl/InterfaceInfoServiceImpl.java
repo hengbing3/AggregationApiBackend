@@ -16,6 +16,7 @@ import com.christer.myapicommon.enums.ApiAuditStatusEnum;
 import com.christer.myapicommon.model.dto.interfaceinfo.*;
 import com.christer.myapicommon.model.entity.*;
 import com.christer.myapicommon.model.vo.InterfaceInfoApplyRecordVO;
+import com.christer.myapicommon.model.vo.InterfaceInfoApplyVO;
 import com.christer.project.common.ResultCode;
 import com.christer.project.exception.BusinessException;
 import com.christer.project.exception.ThrowUtils;
@@ -281,6 +282,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
             return new Page<>(param.getCurrentPage(), param.getPageSize(), 0);
         }
         // 根据已获取的流程实例id，获取已办信息列表
+        param.setProcessInstanceIds(processInstanceIds);
         final int count = interfaceInfoApplyMapper.selectApplyDoneCount(param);
         // 根据流程实例id，查询代办信息列表
         final List<InterfaceInfoApply> list = count > 0 ? interfaceInfoApplyMapper.selectApplyDoneList(param) : Collections.emptyList();
@@ -379,6 +381,18 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         interfaceInfoApplyRecord.setCreateUserId(Long.valueOf(flowableInfo.getAssignee()));
         // 6.返回结果
         return interfaceInfoApplyMapper.insertInterfaceInfoApplyRecord(interfaceInfoApplyRecord) > 0;
+    }
+
+    @Override
+    public Page<InterfaceInfoApplyVO> myInterfaceInfoApplyPage(final MyInterfaceInfoApplyQueryParam param) {
+        final long count = interfaceInfoApplyMapper.selectMyInterfaceInfoApplyCount(param);
+        final List<InterfaceInfoApplyVO> interfaceInfoApplyVOList = count > 0 ? interfaceInfoApplyMapper.selectMyInterfaceInfoApply(param) : Collections.emptyList();
+        final Page<InterfaceInfoApplyVO> applyVOPage = new Page<>();
+        applyVOPage.setRecords(interfaceInfoApplyVOList);
+        applyVOPage.setTotal(count);
+        applyVOPage.setCurrent(param.getCurrentPage());
+        applyVOPage.setSize(param.getPageSize());
+        return applyVOPage;
     }
 
     private static void extractedSetAuditStatus(final InterfaceInfoApproveParam param, final InterfaceInfoApply interfaceInfoApply) {

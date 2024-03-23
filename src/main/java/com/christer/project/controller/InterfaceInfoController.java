@@ -4,12 +4,10 @@ package com.christer.project.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyParam;
-import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyQueryParam;
-import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApproveParam;
-import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoReApplyParam;
+import com.christer.myapicommon.model.dto.interfaceinfo.*;
 import com.christer.myapicommon.model.entity.InterfaceInfoApply;
 import com.christer.myapicommon.model.vo.InterfaceInfoApplyRecordVO;
+import com.christer.myapicommon.model.vo.InterfaceInfoApplyVO;
 import com.christer.project.WebURLConstant;
 import com.christer.project.common.CommonResult;
 import com.christer.project.common.ResultBody;
@@ -240,6 +238,18 @@ public class InterfaceInfoController extends AbstractSessionController {
         final Page<InterfaceInfoApply> page = interfaceInfoService.getDonePage(param);
         return ResultBody.success(page);
     }
+
+    /**
+     * 我的接口申请-分页查询
+     */
+    @PostMapping(WebURLConstant.URI_APPLY + "/page")
+    public CommonResult<Page<InterfaceInfoApplyVO>> myInterfaceInfoApplyPage(@RequestBody @Validated MyInterfaceInfoApplyQueryParam param) {
+        log.info("查询我的接口申请:{}",param);
+        param.setCurrentUserId(getCurrentUserId());
+        final Page<InterfaceInfoApplyVO> page = interfaceInfoService.myInterfaceInfoApplyPage(param);
+        return ResultBody.success(page);
+    }
+
 
 
 

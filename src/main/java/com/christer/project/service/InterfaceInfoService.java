@@ -1,13 +1,11 @@
 package com.christer.project.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyParam;
-import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyQueryParam;
-import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApproveParam;
-import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoReApplyParam;
+import com.christer.myapicommon.model.dto.interfaceinfo.*;
 import com.christer.myapicommon.model.entity.InterfaceInfo;
 import com.christer.myapicommon.model.entity.InterfaceInfoApply;
 import com.christer.myapicommon.model.vo.InterfaceInfoApplyRecordVO;
+import com.christer.myapicommon.model.vo.InterfaceInfoApplyVO;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoInvokeParam;
 import com.christer.project.model.dto.interfaceinfo.InterfaceInfoParam;
 import com.christer.project.model.dto.interfaceinfo.QueryInterfaceInfoParam;
@@ -98,4 +96,11 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
      * @return
      */
     boolean reApplyInterfaceInfo(InterfaceInfoReApplyParam param);
+
+    /**
+     * 我的接口申请-分页查询
+     * @param param
+     * @return
+     */
+    Page<InterfaceInfoApplyVO> myInterfaceInfoApplyPage(MyInterfaceInfoApplyQueryParam param);
 }

@@ -2,9 +2,11 @@ package com.christer.project.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.christer.myapicommon.model.dto.interfaceinfo.InterfaceInfoApplyQueryParam;
+import com.christer.myapicommon.model.dto.interfaceinfo.MyInterfaceInfoApplyQueryParam;
 import com.christer.myapicommon.model.entity.InterfaceInfoApply;
 import com.christer.myapicommon.model.entity.InterfaceInfoApplyRecord;
 import com.christer.myapicommon.model.vo.InterfaceInfoApplyRecordVO;
+import com.christer.myapicommon.model.vo.InterfaceInfoApplyVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -65,4 +67,18 @@ public interface InterfaceInfoApplyMapper extends BaseMapper<InterfaceInfoApply>
      * @return
      */
     String selectProcessInstanceIdById(@Param("id") Long id);
+
+    /**
+     * 我的接口申请-查询数量
+     * @param param
+     * @return
+     */
+    long selectMyInterfaceInfoApplyCount(MyInterfaceInfoApplyQueryParam param);
+
+    /**
+     * 我的接口申请-查询列表
+     * @param param
+     * @return
+     */
+    List<InterfaceInfoApplyVO> selectMyInterfaceInfoApply(MyInterfaceInfoApplyQueryParam param);
 }

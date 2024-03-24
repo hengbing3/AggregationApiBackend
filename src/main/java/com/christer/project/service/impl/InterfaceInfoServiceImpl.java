@@ -395,6 +395,12 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         return applyVOPage;
     }
 
+    @Override
+    public InterfaceInfoApply queryInterfaceInfoApplyById(final Long id) {
+        Assert.notNull(id, "接口申请记录id不能为空");
+        return interfaceInfoApplyMapper.selectById(id);
+    }
+
     private static void extractedSetAuditStatus(final InterfaceInfoApproveParam param, final InterfaceInfoApply interfaceInfoApply) {
         if (StrUtil.equals(interfaceInfoApply.getAuditStatus(), ApiAuditStatusEnum.AUDITING.getCode())) {
             if (StrUtil.equals(PASS.getCode(), param.getAuditResult())) {

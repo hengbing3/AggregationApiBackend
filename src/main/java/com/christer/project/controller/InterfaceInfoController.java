@@ -166,6 +166,19 @@ public class InterfaceInfoController extends AbstractSessionController {
     }
 
     /**
+     * 查看接口申请详情
+     * @param id
+     * @return
+     */
+    @ApiOperation("查看接口申请详情")
+    @GetMapping(WebURLConstant.URI_APPLY)
+    public CommonResult<InterfaceInfoApply> queryInterfaceInfoApplyById(@RequestParam Long id) {
+        log.info("查看接口申请详情，申请id:{}", id);
+        final InterfaceInfoApply interfaceInfoApply = interfaceInfoService.queryInterfaceInfoApplyById(id);
+        return ResultBody.success(interfaceInfoApply);
+    }
+
+    /**
      * 接口申请
      */
     @PostMapping(WebURLConstant.URI_APPLY)

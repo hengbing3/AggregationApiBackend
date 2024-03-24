@@ -103,4 +103,11 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
      * @return
      */
     Page<InterfaceInfoApplyVO> myInterfaceInfoApplyPage(MyInterfaceInfoApplyQueryParam param);
+
+    /**
+     * 查看接口申请详情
+     * @param id
+     * @return
+     */
+    InterfaceInfoApply queryInterfaceInfoApplyById(Long id);
 }

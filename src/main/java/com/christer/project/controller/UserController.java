@@ -17,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import static com.christer.project.constant.CommonConstant.ADMIN_ROLE;
+import static io.lettuce.core.AclCategory.ADMIN;
+
 /**
  * @author Christer
  * @version 1.0
@@ -67,6 +70,10 @@ public class UserController extends AbstractSessionController {
         return Boolean.TRUE.equals(flag) ? ResultBody.success() : ResultBody.failed(ResultCode.FAILED);
     }
 
+    // TODO 重置密码接口
+
+    // TODO 新增用户
+
     @PostMapping(WebURLConstant.URI_USER_LOGOUT)
     @ApiOperation("用户登出")
     public CommonResult<Void> userLogout() {
@@ -82,6 +89,7 @@ public class UserController extends AbstractSessionController {
 
     @PostMapping(WebURLConstant.URI_USER_PAGE)
     @ApiOperation("用户分页查询")
+    @SaCheckRole(ADMIN_ROLE)
     public CommonResult<Page<UserInfoVO>> queryUserByCondition(@RequestBody @Validated UserQueryParam userParam) {
         log.info("user page condition:{}", userParam);
         final Page<UserInfoVO> userInfoVOPage = userService.queryUserByCondition(userParam);

@@ -46,6 +46,8 @@ public class UserQueryParam extends PageCondition implements Serializable {
      */
     private String userProfile;
 
+    private String userAccount;
+
     /**
      * 用户角色：user/admin/ban
      */

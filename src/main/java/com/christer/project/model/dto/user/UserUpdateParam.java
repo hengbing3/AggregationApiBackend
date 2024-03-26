@@ -35,4 +35,12 @@ public class UserUpdateParam implements Serializable {
      * 用户简介
      */
     private String userProfile;
+    /**
+     * 用户角色
+     */
+    private String userRole;
+    /**
+     * 用户关联的部门id
+     */
+    private Integer departmentId;
 }

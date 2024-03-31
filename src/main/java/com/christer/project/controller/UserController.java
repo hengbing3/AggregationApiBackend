@@ -2,6 +2,7 @@ package com.christer.project.controller;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.christer.myapicommon.model.dto.user.UserAddParam;
 import com.christer.project.WebURLConstant;
 import com.christer.project.common.CommonResult;
 import com.christer.project.common.ResultBody;
@@ -18,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static com.christer.project.constant.CommonConstant.ADMIN_ROLE;
-import static io.lettuce.core.AclCategory.ADMIN;
 
 /**
  * @author Christer
@@ -72,7 +72,19 @@ public class UserController extends AbstractSessionController {
 
     // TODO 重置密码接口
 
-    // TODO 新增用户
+    /**
+     * 新增用户
+     * @param userAddParam
+     * @return
+     */
+    @PostMapping(WebURLConstant.URI_USER + "/add")
+    @ApiOperation("新增用户")
+    @SaCheckRole(ADMIN_ROLE)
+    public CommonResult<Void> addUser(@RequestBody @Validated UserAddParam userAddParam) {
+        log.info("add user param: {}", userAddParam);
+        final Boolean flag = userService.addUser(userAddParam);
+        return Boolean.TRUE.equals(flag) ? ResultBody.success() : ResultBody.failed(ResultCode.FAILED);
+    }
 
     @PostMapping(WebURLConstant.URI_USER_LOGOUT)
     @ApiOperation("用户登出")

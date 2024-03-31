@@ -1,6 +1,7 @@
 package com.christer.project.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.christer.myapicommon.model.dto.user.UserAddParam;
 import com.christer.project.model.dto.user.*;
 import com.christer.project.model.vo.UserInfoVO;
 
@@ -52,4 +53,11 @@ public interface UserService {
      * @return flag
      */
     Boolean changePassword(ChangePasswordParam changePasswordParam);
+
+    /**
+     * 新增用户
+     * @param userAddParam
+     * @return
+     */
+    Boolean addUser(UserAddParam userAddParam);
 }

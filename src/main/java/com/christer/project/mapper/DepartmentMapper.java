@@ -22,7 +22,7 @@ public interface DepartmentMapper extends BaseMapper<DepartmentEntity> {
      * @param id 用户id
      * @param defaultDepartment 默认用户关联的部门id
      */
-    void insertUserAndDepartmentRelation(@Param("id") Long id, @Param("defaultDepartment") Long defaultDepartment);
+    Boolean insertUserAndDepartmentRelation(@Param("id") Long id, @Param("defaultDepartment") Long defaultDepartment);
 
     /**
      * 关联用户数量

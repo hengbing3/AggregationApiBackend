@@ -61,7 +61,13 @@ mybatis-plus:
 
 
 
+default-flowable-ui-service: http://localhost:6699/flowable-ui
 
+file:
+  upload-dir: ./attachments
+  temp-dir: temp
+  store-dir: store
+  max-upload-size: 1
 
 
 cos:

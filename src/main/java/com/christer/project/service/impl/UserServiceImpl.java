@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.christer.myapicommon.model.dto.user.UserAddParam;
 import com.christer.myapicommon.model.entity.UserEntity;
 import com.christer.project.common.ResultCode;
 import com.christer.project.exception.BusinessException;
@@ -19,6 +20,7 @@ import com.christer.project.mapper.DepartmentMapper;
 import com.christer.project.mapper.UserMapper;
 import com.christer.project.model.dto.user.*;
 import com.christer.project.model.vo.UserInfoVO;
+import com.christer.project.service.FileService;
 import com.christer.project.service.UserService;
 import com.christer.project.util.BeanCopyUtil;
 import com.christer.project.util.ValidateUtil;
@@ -38,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -60,10 +63,14 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     private final DepartmentMapper departmentMapper;
+
+
     @Value("${default-flowable-ui-service}")
     private String flowableServiceUI;
 
     private final ResourceLoader resourceLoader;
+
+    private final FileService fileService;
 
 
     @Override
@@ -143,6 +150,11 @@ public class UserServiceImpl implements UserService {
         queryWrapper.eq(org.springframework.util.StringUtils.hasText(userParam.getUserRole()), UserEntity::getUserRole, userParam.getUserRole());
         Page<UserEntity> userEntityPage = userMapper.selectPage(rowPage, queryWrapper);
         List<UserInfoVO> userInfoVOS = BeanCopyUtil.copyListProperties(userEntityPage.getRecords(), UserInfoVO::new);
+        for (final UserInfoVO userInfoVO : userInfoVOS) {
+            if (StringUtils.startsWith(userInfoVO.getUserAvatar(), "store")) {
+                userInfoVO.setUserAvatar("http://localhost:8081/attachments" + "/" + userInfoVO.getUserAvatar());
+            }
+        }
         Page<UserInfoVO> userInfoPage = new Page<>(userEntityPage.getCurrent(), userEntityPage.getSize(), userEntityPage.getTotal());
         userInfoPage.setRecords(userInfoVOS);
         return userInfoPage;
@@ -194,6 +206,38 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException("密码修改失败！");
         }
         return update > 0;
+    }
+
+    @Override
+    public Boolean addUser(final UserAddParam userAddParam) {
+        if (!StringUtils.equals(userAddParam.getUserPassword(), userAddParam.getCheckPassword())) {
+            throw new BusinessException("两次密码输入不一致！");
+        }
+        QueryWrapper<UserEntity> userEntityQueryWrapper = new QueryWrapper<>();
+        userEntityQueryWrapper.lambda().eq(UserEntity::getDeletedFlag, "false")
+                .eq(UserEntity::getUserAccount, userAddParam.getUserAccount());
+        final UserEntity existUserEntity = userMapper.selectOne(userEntityQueryWrapper);
+
+        ThrowUtils.throwIf(null != existUserEntity, "账号已经存在！");
+
+        UserEntity userEntity = BeanUtil.copyProperties(userAddParam, UserEntity.class);
+        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userEntity.getUserPassword()).getBytes());
+        userEntity.setUserPassword(encryptPassword);
+        // 设置默认用户信息
+
+        userEntity.setUserAvatar(fileService.transferToFinalPath(userAddParam.getUserAvatar()));
+        // 注册时，分配密钥
+        userEntity.setAccessKey(DigestUtil.md5Hex(SALT + userAddParam.getUserAccount() + RandomUtil.randomNumbers(5)));
+        userEntity.setSecretKey(DigestUtil.md5Hex(SALT + userAddParam.getUserAccount() + RandomUtil.randomNumbers(8)));
+        userMapper.insert(userEntity);
+        // 新增用户部门关联关系
+        final Boolean flag = departmentMapper.insertUserAndDepartmentRelation(userEntity.getId(), Long.valueOf(userAddParam.getDepartmentId()));
+        userEntity.setUserPassword(userAddParam.getUserPassword());
+        userEntity.setAccessKey(null);
+        userEntity.setSecretKey(null);
+        userEntity.setUserAvatar(null);
+        extractedSyncUserInfo(userEntity);
+        return flag;
     }
 
     /**

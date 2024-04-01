@@ -163,21 +163,34 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserInfoVO selectById(Long id) {
         Assert.notNull(id, " id 不能为空！");
-        return BeanUtil.copyProperties(userMapper.selectById(id), UserInfoVO.class);
+        final UserInfoVO userInfoVO = BeanUtil.copyProperties(userMapper.selectById(id), UserInfoVO.class);
+        if (StringUtils.startsWith(userInfoVO.getUserAvatar(), "store")) {
+            userInfoVO.setUserAvatar("http://localhost:8081/attachments" + "/" + userInfoVO.getUserAvatar());
+        }
+        return userInfoVO;
     }
 
     @Override
     public boolean updateUserInfo(UserUpdateParam userUpdateParam) {
         // 业务层校验
         ValidateUtil.validateBean(userUpdateParam);
+        // 判断头像的路径是否需要转换
+        if (StringUtils.startsWith(userUpdateParam.getUserAvatar(), "temp")) {
+            userUpdateParam.setUserAvatar(fileService.transferToFinalPath(userUpdateParam.getUserAvatar()));
+        }
         // 更新用户信息
         UpdateWrapper<UserEntity> userEntityUpdateWrapper = new UpdateWrapper<>();
         LambdaUpdateWrapper<UserEntity> eq = userEntityUpdateWrapper.lambda()
                 .set(StringUtils.isNotBlank(userUpdateParam.getUserName()), UserEntity::getUserName, userUpdateParam.getUserName())
                 .set(StringUtils.isNotBlank(userUpdateParam.getUserAvatar()), UserEntity::getUserAvatar, userUpdateParam.getUserAvatar())
                 .set(StringUtils.isNotBlank(userUpdateParam.getUserProfile()), UserEntity::getUserProfile, userUpdateParam.getUserProfile())
+                .set(StringUtils.isNotBlank(userUpdateParam.getUserRole()), UserEntity::getUserRole, userUpdateParam.getUserRole())
                 .eq(UserEntity::getId, userUpdateParam.getId())
                 .eq(UserEntity::getDeletedFlag, '0');
+        // 删除用户与部门的关联
+        userMapper.deleteUserAndDeptRelation(userUpdateParam.getId());
+        // 新增用户与部门的关联
+        departmentMapper.insertUserAndDepartmentRelation(userUpdateParam.getId(), Long.valueOf(userUpdateParam.getDepartmentId()));
         return userMapper.update(null, eq) > 0;
     }
 
@@ -209,6 +222,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean addUser(final UserAddParam userAddParam) {
         if (!StringUtils.equals(userAddParam.getUserPassword(), userAddParam.getCheckPassword())) {
             throw new BusinessException("两次密码输入不一致！");

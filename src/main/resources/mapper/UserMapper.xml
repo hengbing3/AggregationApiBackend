@@ -4,4 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.christer.project.mapper.UserMapper">
 
+    <delete id="deleteUserAndDeptRelation">
+        delete from sys_user_department where user_id = #{userId}
+    </delete>
 </mapper>

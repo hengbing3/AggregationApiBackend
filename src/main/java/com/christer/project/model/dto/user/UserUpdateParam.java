@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -38,9 +39,11 @@ public class UserUpdateParam implements Serializable {
     /**
      * 用户角色
      */
+    @NotBlank(message = "用户角色不能为空")
     private String userRole;
     /**
      * 用户关联的部门id
      */
+    @NotNull(message = "用户关联的部门id不能为空")
     private Integer departmentId;
 }

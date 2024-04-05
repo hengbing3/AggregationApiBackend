@@ -58,4 +58,11 @@ public interface DepartmentMapper extends BaseMapper<DepartmentEntity> {
      * @return
      */
     List<DepartmentVO> selectListByParam(DepartmentPageParam param);
+
+    /**
+     * 查询用户关联的部门id
+     * @param id 用户id
+     * @return
+     */
+    Long selectDepartmentIdByUserId(@Param("id") Long id);
 }

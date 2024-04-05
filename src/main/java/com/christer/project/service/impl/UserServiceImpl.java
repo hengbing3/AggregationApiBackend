@@ -136,7 +136,10 @@ public class UserServiceImpl implements UserService {
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userParam.getUserPassword()).getBytes());
         ThrowUtils.throwIf(!StringUtils.equals(encryptPassword, Objects.requireNonNull(userEntity).getUserPassword())
                 , ResultCode.PARAMS_ERROR, "用户名或密码错误！");
-        return BeanUtil.copyProperties(userEntity, UserInfoVO.class);
+        final UserInfoVO userInfoVO = BeanUtil.copyProperties(userEntity, UserInfoVO.class);
+        // 获取用户关联的部门信息
+        userInfoVO.setDepartmentId(departmentMapper.selectDepartmentIdByUserId(userEntity.getId()));
+        return userInfoVO;
     }
 
     @Override
@@ -167,10 +170,13 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.startsWith(userInfoVO.getUserAvatar(), "store")) {
             userInfoVO.setUserAvatar("http://localhost:8081/attachments" + "/" + userInfoVO.getUserAvatar());
         }
+        // 获取用户关联的部门信息
+        userInfoVO.setDepartmentId(departmentMapper.selectDepartmentIdByUserId(userInfoVO.getId()));
         return userInfoVO;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateUserInfo(UserUpdateParam userUpdateParam) {
         // 业务层校验
         ValidateUtil.validateBean(userUpdateParam);
@@ -187,6 +193,24 @@ public class UserServiceImpl implements UserService {
                 .set(StringUtils.isNotBlank(userUpdateParam.getUserRole()), UserEntity::getUserRole, userUpdateParam.getUserRole())
                 .eq(UserEntity::getId, userUpdateParam.getId())
                 .eq(UserEntity::getDeletedFlag, '0');
+        // 获取旧的部门id
+        final Long oldDepartmentId = departmentMapper.selectDepartmentIdByUserId(userUpdateParam.getId());
+        // flowable 同步更新用户部门信息
+        final HashMap<String, String> param = new HashMap<>();
+         param.put("userId", String.valueOf(userUpdateParam.getId()));
+         param.put("departmentId", String.valueOf(userUpdateParam.getDepartmentId()));
+         param.put("oldDepartmentId", String.valueOf(oldDepartmentId));
+         // 生成签名，防止数据被篡改
+        final String digestHex = getDigestSign(userUpdateParam.getId() + ":" + userUpdateParam.getDepartmentId(), SALT);
+        param.put("sign", digestHex);
+        final HttpResponse execute = HttpRequest.put(flowableServiceUI + "/updateUser")
+                .addHeaders(param)
+                .charset(StandardCharsets.UTF_8)
+                .execute();
+        if (execute.getStatus() != 200) {
+            log.error("flowable 同步更新用户部门信息失败：{}", execute.body());
+            throw new BusinessException(ResultCode.SYSTEM_ERROR, "用户更新失败！");
+        }
         // 删除用户与部门的关联
         userMapper.deleteUserAndDeptRelation(userUpdateParam.getId());
         // 新增用户与部门的关联
@@ -250,6 +274,8 @@ public class UserServiceImpl implements UserService {
         userEntity.setAccessKey(null);
         userEntity.setSecretKey(null);
         userEntity.setUserAvatar(null);
+        // 若不为注册， flowable 需要同步用户部门信息
+        userEntity.setDepartmentId(Long.valueOf(userAddParam.getDepartmentId()));
         extractedSyncUserInfo(userEntity);
         return flag;
     }

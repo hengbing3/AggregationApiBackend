@@ -50,4 +50,8 @@ public class UserInfoVO implements Serializable {
     private List<String> userPermissionList;
 
     private String token;
+    /**
+     * 所属部门id
+     */
+    private Long departmentId;
 }

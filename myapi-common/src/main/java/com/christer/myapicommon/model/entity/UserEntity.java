@@ -93,4 +93,7 @@ public class UserEntity implements Serializable {
      * 是否删除
      */
     private Boolean deletedFlag;
+
+    @TableField(exist = false)
+    private Long departmentId;
 }

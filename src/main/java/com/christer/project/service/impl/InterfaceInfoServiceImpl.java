@@ -245,7 +245,13 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
     @Override
     public Page<InterfaceInfoApply> getTodoPage(final InterfaceInfoApplyQueryParam param) {
         // 获取工作流的代办 流程实例id列表
-        final HttpResponse response = HttpRequest.post(flowableServiceUI + "/process/totoTask?userId=" + param.getCurrentUserId())
+        String userId = "";
+        if (1L  == param.getCurrentUserId()) {
+            userId = "admin";
+        } else {
+            userId = String.valueOf(param.getCurrentUserId());
+        }
+        final HttpResponse response = HttpRequest.post(flowableServiceUI + "/process/totoTask?userId=" + userId)
                 .execute();
         if (response.getStatus() != 200) {
             log.error("获取工作流的代办失败：{}", response.body());
@@ -270,7 +276,9 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
     @Override
     public Page<InterfaceInfoApply> getDonePage(final InterfaceInfoApplyQueryParam param) {
         // 根据当前用户，去获取已办信息的流程实例id列表
-        final HttpResponse response = HttpRequest.post(flowableServiceUI + "/process/doneTask?userId=" + param.getCurrentUserId())
+        String userId = 1L  == param.getCurrentUserId() ? "admin" : String.valueOf(param.getCurrentUserId());
+
+        final HttpResponse response = HttpRequest.post(flowableServiceUI + "/process/doneTask?userId=" + userId)
                 .execute();
         if (response.getStatus() != 200) {
             log.error("获取工作流的代办失败：{}", response.body());

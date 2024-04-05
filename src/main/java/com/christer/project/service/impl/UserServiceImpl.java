@@ -226,7 +226,7 @@ public class UserServiceImpl implements UserService {
         }
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + changePasswordParam.getUserPassword()).getBytes());
         final UserEntity userEntity = userMapper.selectById(changePasswordParam.getId());
-        if (StringUtils.equals(encryptPassword, userEntity.getUserPassword())) {
+        if (StringUtils.equals(encryptPassword, userEntity.getUserPassword()) && Boolean.FALSE.equals(changePasswordParam.getIsRestPassword())) {
             throw new BusinessException("新密码不能与旧密码一致! ");
         }
         final LambdaUpdateWrapper<UserEntity> updateWrapper = new LambdaUpdateWrapper<>();

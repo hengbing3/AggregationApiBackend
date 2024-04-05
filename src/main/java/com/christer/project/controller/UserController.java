@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,9 @@ public class UserController extends AbstractSessionController {
     private final UserService userService;
 
     private final SessionServiceConfig sessionService;
+
+    @Value("${default-password}")
+    private String resetPassword;
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
@@ -70,7 +74,19 @@ public class UserController extends AbstractSessionController {
         return Boolean.TRUE.equals(flag) ? ResultBody.success() : ResultBody.failed(ResultCode.FAILED);
     }
 
-    // TODO 重置密码接口
+
+    @PutMapping(WebURLConstant.URI_USER + "/resetPassword")
+    @ApiOperation("重置密码")
+    public CommonResult<Void> resetPassword(@RequestParam Long id) {
+        log.info("user reset password:{}", id);
+        final ChangePasswordParam changePasswordParam = new ChangePasswordParam();
+        changePasswordParam.setId(id);
+        changePasswordParam.setUserPassword(resetPassword);
+        changePasswordParam.setConfirmPassword(resetPassword);
+        changePasswordParam.setIsRestPassword(true);
+        final Boolean flag = userService.changePassword(changePasswordParam);
+        return Boolean.TRUE.equals(flag) ? ResultBody.success() : ResultBody.failed(ResultCode.FAILED);
+    }
 
     /**
      * 新增用户

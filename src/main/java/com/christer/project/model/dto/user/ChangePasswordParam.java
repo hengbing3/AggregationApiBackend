@@ -35,4 +35,6 @@ public class ChangePasswordParam {
     @Length(max = 16, message = "密码最大支持16位！")
     @NotBlank(message = "密码不能为空！")
     private String confirmPassword;
+
+    private Boolean isRestPassword;
 }

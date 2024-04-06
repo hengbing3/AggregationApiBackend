@@ -12,14 +12,13 @@ import java.io.Serializable;
 /**
  * @author Christer
  * @version 1.0
- * @date 2024-01-25 21:49
+ * @date 2024-04-06 17:30
  * Description:
- * 用户信息更新参数
  */
 @Setter
 @Getter
 @ToString
-public class UserUpdateParam implements Serializable {
+public class MyUserUpdateParam implements Serializable {
 
     @NotNull
     private Long id;
@@ -36,14 +35,4 @@ public class UserUpdateParam implements Serializable {
      * 用户简介
      */
     private String userProfile;
-    /**
-     * 用户角色
-     */
-    @NotBlank(message = "用户角色不能为空")
-    private String userRole;
-    /**
-     * 用户关联的部门id
-     */
-    @NotNull(message = "用户关联的部门id不能为空")
-    private Integer departmentId;
 }

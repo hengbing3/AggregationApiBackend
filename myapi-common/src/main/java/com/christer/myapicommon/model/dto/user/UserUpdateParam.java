@@ -1,11 +1,11 @@
 package com.christer.myapicommon.model.dto.user;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -20,7 +20,7 @@ import java.io.Serializable;
 @ToString
 public class UserUpdateParam implements Serializable {
 
-    @NonNull
+    @NotNull
     private Long id;
     /**
      * 用户昵称

@@ -16,6 +16,8 @@ public final class WebURLConstant {
     }
 
     public static final String URI_USER = "/user";
+    public static final String URI_MY_USER_INFO = "/myUserInfo";
+    public static final String URI_USER_ACCESS_KEY = "/user/accessKey";
     public static final String URI_PAGE = "/page";
     public static final String URI_LIST = "/list";
 

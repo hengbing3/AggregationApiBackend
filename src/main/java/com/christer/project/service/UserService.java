@@ -2,6 +2,7 @@ package com.christer.project.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.christer.myapicommon.model.dto.user.UserAddParam;
+import com.christer.myapicommon.model.vo.UserCertificateVO;
 import com.christer.project.model.dto.user.*;
 import com.christer.project.model.vo.UserInfoVO;
 
@@ -60,4 +61,15 @@ public interface UserService {
      * @return
      */
     Boolean addUser(UserAddParam userAddParam);
+
+    UserCertificateVO getUserAccessKey(Long currentUserId);
+
+    /**
+     * 更新用户凭证
+     * @param currentUserInfo
+     * @return
+     */
+    Boolean updateUserAccessKey(UserInfoVO currentUserInfo);
+
+    boolean updateMyUserInfo(MyUserUpdateParam userUpdateParam);
 }

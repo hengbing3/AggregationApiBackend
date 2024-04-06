@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.christer.myapicommon.model.dto.user.UserAddParam;
 import com.christer.myapicommon.model.entity.UserEntity;
+import com.christer.myapicommon.model.vo.UserCertificateVO;
 import com.christer.project.common.ResultCode;
 import com.christer.project.exception.BusinessException;
 import com.christer.project.exception.ThrowUtils;
@@ -27,6 +28,7 @@ import com.christer.project.util.ValidateUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -278,6 +280,44 @@ public class UserServiceImpl implements UserService {
         userEntity.setDepartmentId(Long.valueOf(userAddParam.getDepartmentId()));
         extractedSyncUserInfo(userEntity);
         return flag;
+    }
+
+    @Override
+    public UserCertificateVO getUserAccessKey(final Long currentUserId) {
+        Assert.notNull(currentUserId,"用户ID不能为空");
+        return userMapper.getUserAccessKey(currentUserId);
+    }
+
+    @Override
+    public Boolean updateUserAccessKey(final UserInfoVO currentUserInfo) {
+        final UserEntity userEntity = new UserEntity();
+        BeanUtils.copyProperties(currentUserInfo, userEntity);
+        userEntity.setAccessKey(DigestUtil.md5Hex(SALT + currentUserInfo.getUserAccount() + RandomUtil.randomNumbers(5)));
+        userEntity.setSecretKey(DigestUtil.md5Hex(SALT + currentUserInfo.getUserAccount() + RandomUtil.randomNumbers(8)));
+        final LambdaUpdateWrapper<UserEntity> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.set(UserEntity::getAccessKey, userEntity.getAccessKey())
+                .set(UserEntity::getSecretKey, userEntity.getSecretKey())
+                .eq(UserEntity::getId, userEntity.getId());
+        return userMapper.update(userEntity, updateWrapper) > 0;
+    }
+
+    @Override
+    public boolean updateMyUserInfo(final MyUserUpdateParam userUpdateParam) {
+        // 业务层校验
+        ValidateUtil.validateBean(userUpdateParam);
+        // 判断头像的路径是否需要转换
+        if (StringUtils.startsWith(userUpdateParam.getUserAvatar(), "temp")) {
+            userUpdateParam.setUserAvatar(fileService.transferToFinalPath(userUpdateParam.getUserAvatar()));
+        }
+        // 更新用户信息
+        UpdateWrapper<UserEntity> userEntityUpdateWrapper = new UpdateWrapper<>();
+        LambdaUpdateWrapper<UserEntity> eq = userEntityUpdateWrapper.lambda()
+                .set(StringUtils.isNotBlank(userUpdateParam.getUserName()), UserEntity::getUserName, userUpdateParam.getUserName())
+                .set(StringUtils.isNotBlank(userUpdateParam.getUserAvatar()), UserEntity::getUserAvatar, userUpdateParam.getUserAvatar())
+                .set(StringUtils.isNotBlank(userUpdateParam.getUserProfile()), UserEntity::getUserProfile, userUpdateParam.getUserProfile())
+                .eq(UserEntity::getId, userUpdateParam.getId())
+                .eq(UserEntity::getDeletedFlag, '0');
+        return userMapper.update(null, eq) > 0;
     }
 
     /**

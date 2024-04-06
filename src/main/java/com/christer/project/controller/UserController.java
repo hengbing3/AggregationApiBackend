@@ -3,6 +3,7 @@ package com.christer.project.controller;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.christer.myapicommon.model.dto.user.UserAddParam;
+import com.christer.myapicommon.model.vo.UserCertificateVO;
 import com.christer.project.WebURLConstant;
 import com.christer.project.common.CommonResult;
 import com.christer.project.common.ResultBody;
@@ -51,9 +52,18 @@ public class UserController extends AbstractSessionController {
 
     @PutMapping(WebURLConstant.URI_USER)
     @ApiOperation("用户编辑")
+    @SaCheckRole(ADMIN_ROLE)
     public CommonResult<Void> editUserInfo(@RequestBody @Validated UserUpdateParam userUpdateParam) {
         log.info("user update,param:{}", userUpdateParam);
         return userService.updateUserInfo(userUpdateParam) ? ResultBody.success()
+                : ResultBody.failed(ResultCode.FAILED);
+    }
+
+    @PutMapping(WebURLConstant.URI_MY_USER_INFO)
+    @ApiOperation("编辑个人信息")
+    public CommonResult<Void> updateMyUserInfo(@RequestBody @Validated MyUserUpdateParam userUpdateParam) {
+        log.info("user update,param:{}", userUpdateParam);
+        return userService.updateMyUserInfo(userUpdateParam) ? ResultBody.success()
                 : ResultBody.failed(ResultCode.FAILED);
     }
 
@@ -113,6 +123,23 @@ public class UserController extends AbstractSessionController {
     @ApiOperation("当前登录用户信息")
     public CommonResult<UserInfoVO> getUserInfo() {
         return ResultBody.success(getCurrentUserInfo());
+    }
+
+    @GetMapping(WebURLConstant.URI_USER_ACCESS_KEY)
+    @ApiOperation("获取用户访问密钥")
+    public CommonResult<UserCertificateVO> getUserAccessKey() {
+        log.info("get user access key");
+        final UserCertificateVO userCertificateVO = userService.getUserAccessKey(getCurrentUserId());
+        return ResultBody.success(userCertificateVO);
+    }
+
+    @PutMapping(WebURLConstant.URI_USER_ACCESS_KEY)
+    @ApiOperation("更新用户凭证")
+    public CommonResult<Void> updateUserAccessKey() {
+        log.info("update user access key: {}", getCurrentUserId());
+        final Boolean flag = userService.updateUserAccessKey(getCurrentUserInfo());
+        return Boolean.TRUE.equals(flag) ? ResultBody.success()
+                : ResultBody.failed(ResultCode.FAILED);
     }
 
     @PostMapping(WebURLConstant.URI_USER_PAGE)

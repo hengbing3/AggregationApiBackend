@@ -4,6 +4,7 @@ package com.christer.project.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import com.christer.myapicommon.model.entity.UserEntity;
+import com.christer.myapicommon.model.vo.UserCertificateVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,4 +21,11 @@ public interface UserMapper extends BaseMapper<UserEntity> {
      * @param id 用户id
      */
     void deleteUserAndDeptRelation(@Param("userId") Long id);
+
+    /**
+     * 获取用户访问密钥
+     * @param currentUserId
+     * @return
+     */
+    UserCertificateVO getUserAccessKey(@Param("currentUserId") Long currentUserId);
 }

@@ -7,4 +7,7 @@
     <delete id="deleteUserAndDeptRelation">
         delete from sys_user_department where user_id = #{userId}
     </delete>
+    <select id="getUserAccessKey" resultType="com.christer.myapicommon.model.vo.UserCertificateVO">
+        select access_key,secret_key from user where id = #{currentUserId}
+    </select>
 </mapper>

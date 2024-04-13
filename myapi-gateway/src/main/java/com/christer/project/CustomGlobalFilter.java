@@ -1,6 +1,7 @@
 package com.christer.project;
 
 import com.christer.myapiclientsdk.uitls.SignUtils;
+import com.christer.myapicommon.exception.BusinessException;
 import com.christer.myapicommon.model.entity.InterfaceInfo;
 import com.christer.myapicommon.model.entity.UserEntity;
 import com.christer.myapicommon.service.InnerInterfaceInfoService;
@@ -168,14 +169,11 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
                             // 拼接字符串
                             return super.writeWith(fluxBody.map(dataBuffer -> {
                                 // 调用成功，接口调用次数 + 1 invokeCount
-                                boolean invoke = false;
-                                try {
-                                    invoke = innerUserInterfaceInfoService.invokeCount(interfaceInfoId, userId);
-                                } catch (Exception e) {
-                                    log.error("invokeCount error", e);
-                                }
+                                boolean invoke  = innerUserInterfaceInfoService.invokeCount(interfaceInfoId, userId);
+
                                 if (Boolean.FALSE.equals(invoke)) {
                                     log.error("接口统计调用次数失败！");
+                                    throw new BusinessException("接口调用失败！");
                                 }
                                 byte[] content = new byte[dataBuffer.readableByteCount()];
                                 dataBuffer.read(content);

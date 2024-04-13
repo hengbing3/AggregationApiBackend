@@ -6,6 +6,7 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
+import com.christer.myapiclientsdk.exception.ErrorResponse;
 import com.christer.myapiclientsdk.model.User;
 import com.christer.myapiclientsdk.uitls.SignUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -100,7 +101,8 @@ public class MyApiClient {
             log.info("响应状态码:{}", httpResponse.getStatus());
             result = httpResponse.body();
             if (httpResponse.getStatus() != 200) {
-                result = "服务器内部错误:" + extractErrorMessage(result);
+                final ErrorResponse errorResponse = JSONUtil.toBean(result, ErrorResponse.class);
+                result = "服务器内部错误:" + errorResponse.getMessage();
             }
             log.info(result);
         } catch (Exception e) {
@@ -111,6 +113,7 @@ public class MyApiClient {
     }
 
     public String extractErrorMessage(String html) {
+
         Document doc = Jsoup.parse(html);
         // 尝试根据具体的HTML结构来提取错误信息
         Element errorElement = doc.select("div[style='white-space:pre-wrap;']").first();

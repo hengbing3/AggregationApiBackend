@@ -1,13 +1,14 @@
-package com.christer.project.exception;
+package com.christer.myapicommon.exception;
 
-import com.christer.project.common.ResultCode;
+import com.christer.myapicommon.common.ResultCode;
 import lombok.Getter;
 
 /**
  * @author Christer
  * @version 1.0
- * @date 2023-09-04 21:22
+ * @date 2024-04-13 15:57
  * Description:
+ * 自定义异常工具类
  */
 @Getter
 public class BusinessException extends RuntimeException {

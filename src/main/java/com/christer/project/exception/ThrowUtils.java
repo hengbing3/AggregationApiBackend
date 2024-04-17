@@ -35,7 +35,7 @@ public class ThrowUtils {
      */
     public static void throwIf(Boolean condition, String message) {
         if (Boolean.TRUE.equals(condition)) {
-            throw new BusinessException(message);
+            throw new com.christer.myapicommon.exception.BusinessException(message);
         }
     }
 

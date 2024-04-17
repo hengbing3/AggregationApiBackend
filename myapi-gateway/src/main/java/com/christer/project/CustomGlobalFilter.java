@@ -169,11 +169,15 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
                             // 拼接字符串
                             return super.writeWith(fluxBody.map(dataBuffer -> {
                                 // 调用成功，接口调用次数 + 1 invokeCount
-                                boolean invoke  = innerUserInterfaceInfoService.invokeCount(interfaceInfoId, userId);
+                                boolean invoke  = false;
+                                try {
+                                    invoke = innerUserInterfaceInfoService.invokeCount(interfaceInfoId, userId);
+                                } catch (Exception e) {
+                                    throw new BusinessException("调用失败！" + e.getMessage());
+                                }
 
                                 if (Boolean.FALSE.equals(invoke)) {
                                     log.error("接口统计调用次数失败！");
-                                    throw new BusinessException("接口调用失败！");
                                 }
                                 byte[] content = new byte[dataBuffer.readableByteCount()];
                                 dataBuffer.read(content);
@@ -200,7 +204,8 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
                 };
                 return chain.filter(exchange.mutate().response(decoratedResponse).build());
             }
-            return chain.filter(exchange);//降级处理返回数据
+            //降级处理返回数据
+            return chain.filter(exchange);
         } catch (Exception e) {
             log.error("网关处理响应异常:", e);
             return chain.filter(exchange);

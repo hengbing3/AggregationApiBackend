@@ -28,6 +28,12 @@ public class GlobalExceptionHandler {
         return ResultBody.failed(e.getCode(), e.getMessage());
     }
 
+    @ExceptionHandler(com.christer.myapicommon.exception.BusinessException.class)
+    public CommonResult<Void> commonBusinessExceptionHandler(com.christer.myapicommon.exception.BusinessException e) {
+        log.error("BusinessException: " + e.getMessage(), e);
+        return ResultBody.failed(e.getCode(), e.getMessage());
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public CommonResult<?> runtimeExceptionHandler(RuntimeException e) {
         log.error("RuntimeException", e);

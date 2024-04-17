@@ -189,6 +189,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         }
         final String usernameByPost = myClient.getUsernameByPost(user);
         log.info("调用结果：{}", usernameByPost);
+        //TODO 调用失败，必须封装响应状态码
         return usernameByPost;
     }
 

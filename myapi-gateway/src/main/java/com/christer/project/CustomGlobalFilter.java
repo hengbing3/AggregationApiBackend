@@ -1,12 +1,14 @@
 package com.christer.project;
 
 import com.christer.myapiclientsdk.uitls.SignUtils;
+import com.christer.myapicommon.common.ResultCode;
 import com.christer.myapicommon.exception.BusinessException;
 import com.christer.myapicommon.model.entity.InterfaceInfo;
 import com.christer.myapicommon.model.entity.UserEntity;
 import com.christer.myapicommon.service.InnerInterfaceInfoService;
 import com.christer.myapicommon.service.InnerUserInterfaceInfoService;
 import com.christer.myapicommon.service.InnerUserService;
+import com.christer.project.util.RedissonLockUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.reactivestreams.Publisher;
@@ -53,6 +55,8 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
 
     public static final String NO_AUTHORIZED = "无权限";
 
+    private final RedissonLockUtil redissonLockUtil;
+
     @DubboReference
     private InnerUserService innerUserService;
 
@@ -63,6 +67,10 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
     private InnerUserInterfaceInfoService innerUserInterfaceInfoService;
 
     public static final String HOST_URL = "http://localhost:8213";
+
+    public CustomGlobalFilter(RedissonLockUtil redissonLockUtil) {
+        this.redissonLockUtil = redissonLockUtil;
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -169,16 +177,13 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
                             // 拼接字符串
                             return super.writeWith(fluxBody.map(dataBuffer -> {
                                 // 调用成功，接口调用次数 + 1 invokeCount
-                                boolean invoke  = false;
-                                try {
-                                    invoke = innerUserInterfaceInfoService.invokeCount(interfaceInfoId, userId);
-                                } catch (Exception e) {
-                                    throw new BusinessException("调用失败！" + e.getMessage());
-                                }
+                                redissonLockUtil.redissonDistributedLocks(("gateway_" + userId).intern(), () -> {
+                                    boolean invoke = innerUserInterfaceInfoService.invokeCount(interfaceInfoId, userId);
+                                    if (!invoke) {
+                                        throw new BusinessException(ResultCode.FAILED, "接口调用失败");
+                                    }
+                                },"操作失败！");
 
-                                if (Boolean.FALSE.equals(invoke)) {
-                                    log.error("接口统计调用次数失败！");
-                                }
                                 byte[] content = new byte[dataBuffer.readableByteCount()];
                                 dataBuffer.read(content);
                                 DataBufferUtils.release(dataBuffer);//释放掉内存

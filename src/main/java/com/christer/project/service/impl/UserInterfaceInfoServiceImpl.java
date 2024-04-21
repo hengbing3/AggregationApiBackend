@@ -86,7 +86,7 @@ public class UserInterfaceInfoServiceImpl extends ServiceImpl<UserInterfaceInfoM
         return userInterfaceInfoMapper.selectList(queryWrapper);
 
     }
-    private final ConcurrentHashMap<String, Object> locks = new ConcurrentHashMap<>();
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -102,16 +102,14 @@ public class UserInterfaceInfoServiceImpl extends ServiceImpl<UserInterfaceInfoM
         ThrowUtils.throwIf(Objects.requireNonNull(currentInfo).getLeftNum() <= 0, "该接口剩余调用次数不足！");
         int update = 0;
         // 加锁
-        final String key = interfaceInfoId + ":" + userId;
-        locks.computeIfAbsent(key, k -> new Object());
-        synchronized(locks.get(key)) {
+
             // 更新接口调用次数
             LambdaUpdateWrapper<UserInterfaceInfo> wrapper = new LambdaUpdateWrapper<>();
             wrapper.eq(UserInterfaceInfo::getInterfaceInfoId, interfaceInfoId)
                     .eq(UserInterfaceInfo::getUserId, userId)
                     .setSql("left_num = left_num - 1, total_num = total_num + 1");
              update = userInterfaceInfoMapper.update(null, wrapper);
-        }
+
         return update > 0;
     }
 }

@@ -27,6 +27,8 @@ public class RedissonConfig {
     public RedissonClient redissonClient() {
         // 1. 创建配置
         final Config config = new Config();
+        // 设置看门狗的超时时间
+        config.setLockWatchdogTimeout(60000);
         // 集群模式
         // config.useClusterServers().addNodeAddress("127.0.0.1:7004", "127.0.0.1:7001");
         final String redisAddress = String.format("redis://%s:%s", host, port);

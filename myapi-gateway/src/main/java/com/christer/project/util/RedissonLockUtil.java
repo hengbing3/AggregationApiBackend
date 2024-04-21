@@ -46,8 +46,12 @@ public class RedissonLockUtil {
      * @param errorMessage 错误消息
      */
     public void redissonDistributedLocks(String lockName, Runnable runnable, ResultCode errorCode, String errorMessage) {
+
         RLock rLock = redissonClient.getLock(lockName);
+
         try {
+            // waitTime  = 0,若无法获取锁，立即返回异常
+            // leaseTime = -1 不设置释放时间，则启用看门狗机制
             if (rLock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
                 runnable.run();
             } else {
@@ -58,7 +62,7 @@ public class RedissonLockUtil {
             throw new BusinessException(ResultCode.FAILED, e.getMessage());
         } finally {
             if (rLock.isHeldByCurrentThread()) {
-                log.info("lockName:{},unLockId:{} ", lockName, Thread.currentThread().getId());
+                log.info("Finally，释放锁成功，lockName:{},unLockId:{} ", lockName, Thread.currentThread().getId());
                 rLock.unlock();
             }
         }

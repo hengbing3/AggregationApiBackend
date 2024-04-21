@@ -177,10 +177,10 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
                             // 拼接字符串
                             return super.writeWith(fluxBody.map(dataBuffer -> {
                                 // 调用成功，接口调用次数 + 1 invokeCount
-                                redissonLockUtil.redissonDistributedLocks(("gateway_" + userId).intern(), () -> {
+                                redissonLockUtil.redissonDistributedLocks(("gateway_" + userId + "_" + interfaceInfoId).intern(), () -> {
                                     boolean invoke = innerUserInterfaceInfoService.invokeCount(interfaceInfoId, userId);
                                     if (!invoke) {
-                                        throw new BusinessException(ResultCode.FAILED, "接口调用失败");
+                                        throw new BusinessException(ResultCode.FAILED, "系统繁忙，接口调用失败");
                                     }
                                 },"操作失败！");
 

@@ -23,6 +23,15 @@ public abstract class BaseRequest<T extends ResultResponse> {
     private Map<String, Object> requestParams = new HashMap<>();
 
     /**
+     * 请求体：json字符串
+     */
+    private String requestBodyStr;
+    /**
+     * 请求头
+     */
+    private Map<String, Object> requestHeaders = new HashMap<>();
+
+    /**
      * get方法
      *
      * @return {@link }

@@ -9,6 +9,7 @@ import cn.hutool.json.JSONUtil;
 import com.christer.myapiclientsdk.exception.ErrorResponse;
 import com.christer.myapiclientsdk.model.User;
 import com.christer.myapiclientsdk.uitls.SignUtils;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
+@Getter
 public class MyApiClient {
 
     private final String accessKey;

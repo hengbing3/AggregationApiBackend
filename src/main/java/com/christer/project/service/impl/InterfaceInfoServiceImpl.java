@@ -11,7 +11,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.christer.myapiclientsdk.client.MyApiClient;
+import com.christer.myapiclientsdk.exception.ApiException;
 import com.christer.myapiclientsdk.model.User;
+import com.christer.myapiclientsdk.request.CurrentRequest;
+import com.christer.myapiclientsdk.response.ResultResponse;
+import com.christer.myapiclientsdk.service.BaseService;
 import com.christer.myapicommon.enums.ApiAuditStatusEnum;
 import com.christer.myapicommon.model.dto.interfaceinfo.*;
 import com.christer.myapicommon.model.entity.*;
@@ -32,6 +36,7 @@ import com.christer.project.util.EncryptUtil;
 import com.christer.project.util.ValidateUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -64,6 +69,8 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
     private final UserMapper userMapper;
 
     private final InterfaceInfoApplyMapper interfaceInfoApplyMapper;
+
+    private final BaseService baseService;
 
     @Value("${default-flowable-ui-service}")
     private String flowableServiceUI;
@@ -177,20 +184,20 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         final UserEntity userEntity = userMapper.selectById(currentUserId);
         final String accessKey = userEntity.getAccessKey();
         final String secretKey = userEntity.getSecretKey();
-        final MyApiClient myClient = new MyApiClient(accessKey, secretKey);
-        // 调用接口
-        // TODO 调用接口的逻辑必须修改
-        final Gson gson = new Gson();
-        User user = null;
+        final ResultResponse resultResponse;
         try {
-            user = gson.fromJson(param.getUserRequestParams(), User.class);
-        } catch (JsonSyntaxException e) {
-            throw new BusinessException(ResultCode.PARAMS_ERROR, "请按照规范填写请求参数！");
+            final MyApiClient myClient = new MyApiClient(accessKey, secretKey);
+            final CurrentRequest currentRequest = new CurrentRequest();
+            Map<String, Object> params = new Gson().fromJson(param.getUserRequestParams(), new TypeToken<Map<String, Object>>() {
+            }.getType());
+            currentRequest.setRequestParams(params);
+            currentRequest.setMethod(interfaceInfo.getMethod());
+            currentRequest.setPath(interfaceInfo.getUrl());
+            resultResponse = baseService.request(myClient, currentRequest);
+        } catch (JsonSyntaxException | ApiException e) {
+            throw new BusinessException(ResultCode.SYSTEM_ERROR, e.getMessage());
         }
-        final String usernameByPost = myClient.getUsernameByPost(user);
-        log.info("调用结果：{}", usernameByPost);
-        //TODO 调用失败，必须封装响应状态码
-        return usernameByPost;
+        return resultResponse.getData();
     }
 
     @Override

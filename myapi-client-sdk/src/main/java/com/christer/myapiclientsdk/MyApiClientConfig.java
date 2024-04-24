@@ -2,6 +2,8 @@ package com.christer.myapiclientsdk;
 
 
 import com.christer.myapiclientsdk.client.MyApiClient;
+import com.christer.myapiclientsdk.service.BaseService;
+import com.christer.myapiclientsdk.service.impl.BaseServiceImpl;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -41,6 +43,13 @@ public class MyApiClientConfig {
     @Bean
     public MyApiClient myApiClient() {
         return new MyApiClient(accessKey, secretKey);
+    }
+
+    @Bean
+    public BaseService baseService() {
+        BaseServiceImpl baseService = new BaseServiceImpl();
+        baseService.setMyApiClient(new MyApiClient(accessKey, secretKey));
+        return baseService;
     }
 }
 

@@ -84,8 +84,8 @@ cos:
 
 myapi:
   client:
-    access-key: abin
-    secret-key: abcdefg
+    access-key: 04b39bb3e178c8ebd20dbff5c09dde84
+    secret-key: 4ef454b6af98c4c4c37b74a5807dd1fc
 # 以下配置指定了应用的名称、使用的协议（Dubbo-RPC实现框架）、注册中心的类型（Nacos）和地址
 dubbo:
   application:

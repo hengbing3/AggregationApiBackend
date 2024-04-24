@@ -1,6 +1,7 @@
 package com.christer.myapiclientsdk.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.http.HttpRequest;
@@ -39,7 +40,7 @@ import java.util.Map;
 @Setter
 public class BaseServiceImpl implements BaseService {
 
-    private static final String gatewayHost = "xxx";
+    private static final String gatewayHost = "http://localhost:8090";
 
     private MyApiClient myApiClient;
 
@@ -109,6 +110,7 @@ public class BaseServiceImpl implements BaseService {
                 data = parseJsonData(data, body);
             }
         } catch (Exception e) {
+            log.error("接口请求时发生异常:{0}", e);
             throw new ApiException(ResultCode.SYSTEM_ERROR, "请求发生错误！");
         }
         return data;
@@ -140,6 +142,7 @@ public class BaseServiceImpl implements BaseService {
         hashMap.put("accessKey", myApiClient.getAccessKey());
         String encodedBody = SecureUtil.md5(body);
         hashMap.put("body", encodedBody);
+        hashMap.put("nonce", RandomUtil.randomNumbers(6));
         hashMap.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
         hashMap.put("sign", SignUtils.genSign(encodedBody, myApiClient.getSecretKey()));
         return hashMap;

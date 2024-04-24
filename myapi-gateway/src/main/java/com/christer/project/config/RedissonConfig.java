@@ -23,6 +23,8 @@ public class RedissonConfig {
 
     private String port;
 
+    private String password;
+
     @Bean
     public RedissonClient redissonClient() {
         // 1. 创建配置
@@ -33,7 +35,10 @@ public class RedissonConfig {
         // config.useClusterServers().addNodeAddress("127.0.0.1:7004", "127.0.0.1:7001");
         final String redisAddress = String.format("redis://%s:%s", host, port);
         // 单机模式
-        config.useSingleServer().setAddress(redisAddress).setDatabase(4);
+        config.useSingleServer()
+                .setAddress(redisAddress)
+                .setPassword(password)
+                .setDatabase(4);
         // 2. 创建实例
         return Redisson.create(config);
     }

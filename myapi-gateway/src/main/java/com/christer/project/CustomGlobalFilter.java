@@ -79,7 +79,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         // 2. 请求日志
         final ServerHttpRequest request = exchange.getRequest();
         log.info("请求唯一标识:{}", request.getId());
-        final String url = HOST_URL + request.getPath().value();
+        final String url =  request.getPath().value().trim();
         log.info("请求路径:{}", url);
         final String method = Objects.requireNonNull(request.getMethod()).toString();
         log.info("请求方法:{}", method);
@@ -114,7 +114,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
             log.error("getInvokeUserByCondition error", e);
         }
         if (null == invokeUser) {
-            return handleResponseError(response, HttpStatus.UNAUTHORIZED, NO_AUTHORIZED);
+            throw new BusinessException( HttpStatus.UNAUTHORIZED.value(), NO_AUTHORIZED);
         }
         if (!StringUtils.hasText(accessKey) || !accessKey.equals(invokeUser.getAccessKey())) {
             return handleResponseError(response, HttpStatus.UNAUTHORIZED, NO_AUTHORIZED);

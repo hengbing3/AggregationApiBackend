@@ -121,12 +121,12 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         ThrowUtils.throwIf(null == interfaceInfo, "接口信息不存在！");
         final MyApiClient myApiClient = getMyApiClient(currentUserId);
         // 判断接口是否能够调用
-        User user = new User();
-        user.setUsername("加油上线！！！");
-        String result = myApiClient.getUsernameByPost(user);
-        if (!StringUtils.hasText(result)) {
-            throw new BusinessException(ResultCode.FAILED, "接口调用失败！");
-        }
+//        User user = new User();
+//        user.setUsername("加油上线！！！");
+//        String result = myApiClient.getUsernameByPost(user);
+//        if (!StringUtils.hasText(result)) {
+//            throw new BusinessException(ResultCode.FAILED, "接口调用失败！");
+//        }
         // 修改接口状态
         InterfaceInfo updateInterfaceInfo = new InterfaceInfo();
         updateInterfaceInfo.setId(id);
@@ -195,6 +195,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
             currentRequest.setPath(interfaceInfo.getUrl());
             resultResponse = baseService.request(myClient, currentRequest);
         } catch (JsonSyntaxException | ApiException e) {
+            log.error("接口请求失败原因:{0}", e);
             throw new BusinessException(ResultCode.SYSTEM_ERROR, e.getMessage());
         }
         return resultResponse.getData();

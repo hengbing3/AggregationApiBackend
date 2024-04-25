@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
@@ -156,8 +157,10 @@ public class BaseServiceImpl implements BaseService {
         }
         urlBuilder.append(path).append("?");
         final Map<String, Object> requestParams = request.getRequestParams();
-        for (final Map.Entry<String, Object> entry : requestParams.entrySet()) {
-            urlBuilder.append(entry.getKey()).append("=").append(entry.getValue());
+        if (!CollectionUtils.isEmpty(requestParams)) {
+            for (final Map.Entry<String, Object> entry : requestParams.entrySet()) {
+                urlBuilder.append(entry.getKey()).append("=").append(entry.getValue());
+            }
         }
         return urlBuilder;
     }

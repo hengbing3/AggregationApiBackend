@@ -12,6 +12,7 @@ import com.christer.myapiclientsdk.exception.ApiException;
 import com.christer.myapiclientsdk.exception.ErrorResponse;
 import com.christer.myapiclientsdk.exception.ResultCode;
 import com.christer.myapiclientsdk.request.BaseRequest;
+import com.christer.myapiclientsdk.request.CalendarRequest;
 import com.christer.myapiclientsdk.request.CurrentRequest;
 import com.christer.myapiclientsdk.response.ResultResponse;
 import com.christer.myapiclientsdk.service.BaseService;
@@ -41,7 +42,7 @@ import java.util.Map;
 @Setter
 public class BaseServiceImpl implements BaseService {
 
-    private static final String gatewayHost = "http://localhost:8090";
+    private static final String gatewayHost = "http://localhost:8090/api";
 
     private MyApiClient myApiClient;
 
@@ -169,6 +170,12 @@ public class BaseServiceImpl implements BaseService {
     public <T extends ResultResponse> T request(MyApiClient myApiClient, BaseRequest<T> request) throws ApiException {
         checkApiClientConfig(myApiClient);
         return request(request);
+    }
+
+    @Override
+    public ResultResponse generateCalendar() {
+        final CalendarRequest calendarRequest = new CalendarRequest();
+        return request(calendarRequest);
     }
 
     private void checkApiClientConfig(MyApiClient myApiClient) {

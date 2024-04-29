@@ -34,4 +34,10 @@ public interface BaseService {
      * @throws ApiException 业务异常
      */
     <T extends ResultResponse> T request(MyApiClient myApiClient, BaseRequest<T> request) throws ApiException;
+
+    /**
+     * 生成摸鱼日历
+     * @return ResultResponse
+     */
+     ResultResponse generateCalendar();
 }

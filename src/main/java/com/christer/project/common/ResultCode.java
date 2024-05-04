@@ -19,7 +19,9 @@ public enum ResultCode {
     INTERFACE_ADD_ERROR(1000, "接口信息新增失败！"),
     INTERFACE_EDIT_ERROR(1001, "接口信息编辑失败！"),
     PARAMS_VALIDATE_ERROR(40001, "参数校验失败！"),
-    PARAMS_ERROR(40000, "请求参数错误！");
+    PARAMS_ERROR(40000, "请求参数错误！"),
+    ALIPAY_CONFIG_ERROR(60000, "支付宝支付配置创建失败！"),
+    ;
 
     private final int code;
     private final String message;

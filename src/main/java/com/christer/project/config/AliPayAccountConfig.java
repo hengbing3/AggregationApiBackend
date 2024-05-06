@@ -50,4 +50,12 @@ public class AliPayAccountConfig extends AlipayConfig {
      * 签名算法类型
      */
     private String signType;
+    /**
+     * 异步通知url
+     */
+    private String notifyUrl;
+    /**
+     * 同步返回url
+     */
+    private String returnUrl;
 }

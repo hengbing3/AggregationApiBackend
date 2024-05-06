@@ -11,6 +11,7 @@ import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.response.AlipayTradeCloseResponse;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.christer.project.config.AliPayAccountConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,9 @@ class AliPayTest {
     @Resource
     private AlipayClient alipayClient;
 
+    @Resource
+    private AliPayAccountConfig aliPayAccountConfig;
+
     /**
      * 预创建订单
      */
@@ -46,7 +50,8 @@ class AliPayTest {
         model.setTimeoutExpress("15m");
         model.setQrCodeTimeoutExpress("15m");
         request.setBizModel(model);
-
+        request.setNotifyUrl(aliPayAccountConfig.getNotifyUrl());
+        request.setReturnUrl(aliPayAccountConfig.getReturnUrl());
         try {
             AlipayTradePrecreateResponse response = alipayClient.execute(request);
             log.info("response:{}", response.getBody());

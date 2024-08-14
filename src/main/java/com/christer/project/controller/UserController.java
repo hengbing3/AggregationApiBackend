@@ -34,7 +34,7 @@ public class UserController extends AbstractSessionController {
 
     private final UserService userService;
 
-    private final SessionServiceConfig sessionService;
+private final SessionServiceConfig sessionService;
 
     @Value("${default-password}")
     private String resetPassword;
